@@ -1,0 +1,35 @@
+<div class='course-video-settings-container'>
+    <div class="course-video-settings-header">
+        <a href="#" class="action-close-course-video-settings">Close</a>
+        <span><%- gettext('Course Video Settings') %></span>
+    </div>
+    <div class='course-video-settings-wrapper'>
+        <div class='transcript-provider-wrapper'>
+            <label><%- gettext('Transcript provider: ') %>
+                <select id='transcript-provider'></select>
+            </label>
+        </div>
+        <div class='transcript-turnaround-wrapper'>
+            <label>
+                <%- gettext('Transcript turnaround: ') %>
+                <select id='transcript-turnaround'></select>
+            <label>
+        </div>
+        <div class='transcript-fidelity-wrapper'>
+            <label>
+                <%- gettext('Transcript fidelity: ') %>
+                <select id='transcript-fidelity'></select>
+            <label>
+        </div>
+        <div class='transcript-languages-wrapper'>
+            <span>Transcript languages</span>
+            <div class='transcript-languages-container'>
+                <div class='languages-menu-container'></div>
+                <a href='#' class='action-add-language'>Add a language</a>
+            </div>
+        </div>
+        <div class='course-video-settings-footer'>
+            <a href="#" class="action-update-course-video-settings">Update Settings</a>
+        </div>
+    </div>
+</div>

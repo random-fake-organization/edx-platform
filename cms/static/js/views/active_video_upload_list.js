@@ -5,13 +5,13 @@ define([
     'js/models/active_video_upload',
     'js/views/baseview',
     'js/views/active_video_upload',
-    'js/views/video_transcript_languages',
+    'js/views/course_video_settings',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/active-video-upload-list.underscore',
     'jquery.fileupload'
 ],
-    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, VideoTranscriptLanguagesView,
+    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, CourseVideoSettingsView,
              HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
         'use strict';
         var ActiveVideoUploadListView,
@@ -21,11 +21,7 @@ define([
             events: {
                 'click .file-drop-area': 'chooseFile',
                 'dragleave .file-drop-area': 'dragleave',
-                'drop .file-drop-area': 'dragleave',
-                'change #transcript-provider': 'providerSelected',
-                'change #transcript-turnaround': 'turnaroundSelected',
-                'change #transcript-fidelity': 'fidelitySelected',
-                'click #transcript-languages-action': 'showTranscriptLanguages'
+                'drop .file-drop-area': 'dragleave'
             },
 
             uploadHeader: gettext('Upload Videos'),
@@ -39,22 +35,19 @@ define([
             defaultFailureMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),  // eslint-disable-line max-len
 
             initialize: function(options) {
-                var videoTranscriptSettings = options.videoTranscriptSettings;
                 this.template = HtmlUtils.template(activeVideoUploadListTemplate);
                 this.collection = new Backbone.Collection();
                 this.itemViews = [];
                 this.listenTo(this.collection, 'add', this.addUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
-                this.activeTranscriptionPlan = options.activeTranscriptPreferences;
-                this.availableTranscriptionPlans = videoTranscriptSettings['transcription_plans'];
-                this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
-                this.videoTranscriptEnabled = !_.isEmpty(this.activeTranscriptionPlan) || !_.isEmpty(this.availableTranscriptionPlans) ? true : false;
+                this.activeTranscriptPreferences = options.activeTranscriptPreferences;
+                this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.videoUploadMaxFileSizeInGB = options.videoUploadMaxFileSizeInGB;
                 this.onFileUploadDone = options.onFileUploadDone;
-                if (options.uploadButton) {
-                    options.uploadButton.click(this.chooseFile.bind(this));
+                if (options.courseVideoSettingsButton) {
+                    options.courseVideoSettingsButton.click(this.showCourseVideoSettingsView.bind(this));
                 }
 
                 this.maxSizeText = StringUtils.interpolate(
@@ -69,162 +62,24 @@ define([
                         supportedVideoTypes: this.videoSupportedFileFormats.join(', ')
                     }
                 );
-                this.selectedProvider = '';
-                this.selectedTurnaroundPlan = '';
-                this.selectedFidelityPlan = '';
-                this.availableLanguages = [];
-                this.activeLanguages = [];
-                this.setTranscriptData();
-
-                // method to send ajax request to save transcript settings
-                this.listenTo(Backbone, 'videotranscripts:saveTranscriptPreferences', this.saveTranscriptPreferences);
-                this.listenTo(Backbone, 'videotranscripts:destroyTranscriptLanguages', this.destroyTranscriptLanguages);
+                this.listenTo(Backbone, 'coursevideosettings:syncActiveTranscriptPreferences', this.syncActiveTranscriptPreferences);
+                this.listenTo(Backbone, 'coursevideosettings:destroyCourseVideoSettingsView', this.destroyCourseVideoSettingsView);
             },
 
-            getProviderPlan: function() {
-                return this.availableTranscriptionPlans;
+            syncActiveTranscriptPreferences: function(activeTranscriptPreferences) {
+                this.activeTranscriptPreferences = activeTranscriptPreferences;
             },
 
-            getTurnaroundPlan: function() {
-                if (this.selectedProvider){
-                    return this.availableTranscriptionPlans[this.selectedProvider].turnaround;
-                }
-            },
-
-            getFidelityPlan: function() {
-                if (this.selectedProvider == 'Cielo24') {
-                    return this.availableTranscriptionPlans[this.selectedProvider].fidelity;
-                }
-            },
-
-            getPlanLanguages: function() {
-                if (this.selectedProvider){
-                    var selectedPlan = this.availableTranscriptionPlans[this.selectedProvider];
-                    if (this.selectedProvider == 'Cielo24') {
-                        return selectedPlan.fidelity[this.selectedFidelityPlan].languages;
-                    }
-                    return selectedPlan.languages;
-                }
-            },
-
-            fidelitySelected: function(event) {
-                this.selectedFidelityPlan = event.target.value;
-                this.manageLanguageContainer();
-            },
-
-            turnaroundSelected: function(event) {
-                this.selectedTurnaroundPlan = event.target.value;
-                this.manageLanguageContainer();
-            },
-
-            providerSelected: function(event) {
-                this.selectedProvider = event.target.value;
-                this.populatePreferenceOptions();
-            },
-
-            manageLanguageContainer: function() {
-                var isTurnaroundSelected = this.$el.find('#transcript-turnaround')[0].options.selectedIndex,
-                    isFidelitySelected = this.$el.find('#transcript-fidelity')[0].options.selectedIndex;
-
-                if ((isTurnaroundSelected > 0 && this.selectedProvider === '3PlayMedia') || (isTurnaroundSelected  > 0 && isFidelitySelected > 0)) {
-                    this.availableLanguages = this.getPlanLanguages();
-                    this.$el.find('.transcript-languages-action-wrapper').show();
-                } else {
-                    this.availableLanguages = {};
-                    this.$el.find('.transcript-languages-action-wrapper').hide();
-                }
-            },
-
-            setTranscriptData: function(){
-                if (this.activeTranscriptionPlan) {
-                    this.selectedProvider = this.activeTranscriptionPlan['provider'];
-                    this.selectedFidelityPlan = this.activeTranscriptionPlan['cielo24_fidelity'];
-                    this.selectedTurnaroundPlan = this.activeTranscriptionPlan['cielo24_turnaround'] ? this.activeTranscriptionPlan['cielo24_turnaround']: this.activeTranscriptionPlan['three_play_turnaround'];
-                    this.activeLanguages = this.activeTranscriptionPlan['preferred_languages'];
-                }
-            },
-
-            populatePreferenceOptions: function() {
-                var self = this,
-                    providerPlan = self.getProviderPlan(),
-                    turnaroundPlan = self.getTurnaroundPlan(),
-                    fidelityPlan = self.getFidelityPlan(),
-                    $provider = self.$el.find('#transcript-provider'),
-                    $turnaround = self.$el.find('#transcript-turnaround'),
-                    $fidelity = self.$el.find('#transcript-fidelity');
-
-                // Provider dropdown
-                $provider.empty().append(new Option('Select provider', ''));
-                _.each(providerPlan, function(providerObject, key){
-                    var option = new Option(providerObject.display_name, key);
-                    if (self.selectedProvider === key) {
-                        option.selected = true;
-                    }
-                    $provider.append(option);
+            showCourseVideoSettingsView: function() {
+                this.courseVideoSettingsView  = new CourseVideoSettingsView({
+                    activeTranscriptPreferences: this.activeTranscriptPreferences,
+                    videoTranscriptSettings: this.videoTranscriptSettings
                 });
-
-                if(turnaroundPlan) {
-                    // Turnaround dropdown
-                    $turnaround.empty().append(new Option('Select turnaround', ''));
-                    _.each(turnaroundPlan, function (value, key) {
-                        var option = new Option(value, key);
-                        if (self.selectedTurnaroundPlan === key) {
-                            option.selected = true;
-                        }
-                        $turnaround.append(option);
-                    });
-                    self.$el.find('.transcript-turnaround-wrapper').show();
-                }
-
-                // Fidelity dropdown
-                if (fidelityPlan) {
-                    $fidelity.empty().append(new Option('Select fidelity', ''));
-                    _.each(fidelityPlan, function(fidelityObject, key){
-                        var option = new Option(fidelityObject.display_name, key);
-                        if (self.selectedFidelityPlan === key) {
-                            option.selected = true;
-                        }
-                        $fidelity.append(option);
-                    });
-                    self.$el.find('.transcript-fidelity-wrapper').show();
-                } else {
-                    self.$el.find('.transcript-fidelity-wrapper').hide();
-                }
-
-                self.manageLanguageContainer();
+                Backbone.trigger('coursevideosettings:showCourseVideoSettingsView');
             },
 
-            showTranscriptLanguages: function() {
-                if (!this.VideoTranscriptLanguagesView) {
-                    this.VideoTranscriptLanguagesView = new VideoTranscriptLanguagesView({
-                        availableLanguages: this.availableLanguages,
-                        activeLanguages: this.activeLanguages
-                    });
-                } else {
-                    this.VideoTranscriptLanguagesView.availableLanguages = this.availableLanguages;
-                    this.VideoTranscriptLanguagesView.activeLanguages = this.activeLanguages;
-                }
-                Backbone.trigger('videotranscripts:showTranscriptLanguages');
-            },
-
-            destroyTranscriptLanguages: function() {
-                this.VideoTranscriptLanguagesView = undefined;
-            },
-
-            saveTranscriptPreferences: function(selectedLanguages) {
-                this.activeLanguages = selectedLanguages;
-                $.postJSON(this.transcriptHandlerUrl, {
-                    provider: this.selectedProvider,
-                    cielo24_fidelity: this.selectedFidelityPlan,
-                    cielo24_turnaround: this.selectedProvider === 'Cielo24' ? this.selectedTurnaroundPlan : '',
-                    three_play_turnaround: this.selectedProvider === '3PlayMedia' ? this.selectedTurnaroundPlan : '',
-                    preferred_languages: this.activeLanguages
-                }, function(data) {
-                    // TODO: check
-                })
-                .fail(function() {
-                    // TODO: check
-                });
+            destroyCourseVideoSettingsView: function() {
+                this.courseVideoSettingsView = null;
             },
 
             render: function() {
@@ -236,16 +91,12 @@ define([
                         uploadHeader: this.uploadHeader,
                         uploadText: this.uploadText,
                         maxSizeText: this.maxSizeText,
-                        videoTranscriptEnabled: this.videoTranscriptEnabled,
                         supportedVideosText: this.supportedVideosText
                     })
                 );
                 _.each(this.itemViews, this.renderUploadView.bind(this));
                 this.$uploadForm = this.$('.file-upload-form');
                 this.$dropZone = this.$uploadForm.find('.file-drop-area');
-                if (this.videoTranscriptEnabled) {
-                    this.$uploadForm.addClass('video-transcript-enabled');
-                }
                 this.$uploadForm.fileupload({
                     type: 'PUT',
                     singleFileUploads: false,
@@ -268,11 +119,6 @@ define([
                 $(window).on('drop', preventDefault);
                 $(window).on('beforeunload', this.onBeforeUnload.bind(this));
                 $(window).on('unload', this.onUnload.bind(this));
-
-                // populate video transcript
-                if (this.videoTranscriptEnabled){
-                    this.populatePreferenceOptions();
-                }
                 return this;
             },
 

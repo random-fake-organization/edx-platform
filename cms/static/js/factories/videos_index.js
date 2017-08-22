@@ -10,7 +10,7 @@ define([
         encodingsDownloadUrl,
         defaultVideoImageURL,
         concurrentUploadLimit,
-        uploadButton,
+        courseVideoSettingsButton,
         previousUploads,
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB,
@@ -21,7 +21,7 @@ define([
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
-                uploadButton: uploadButton,
+                courseVideoSettingsButton: courseVideoSettingsButton,
                 videoSupportedFileFormats: videoSupportedFileFormats,
                 videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
                 videoImageSettings: videoImageSettings,
