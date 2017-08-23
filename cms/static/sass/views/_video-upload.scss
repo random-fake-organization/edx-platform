@@ -13,21 +13,17 @@
     }
   }
 
-  .video-uploads-header, .transcript-settings-header {
+  .video-uploads-header, .course-video-settings-title {
     font-size: 1.5em;
     margin-bottom: .25em;
     font-weight: 600
   }
 
-  .transcript-settings-container {
-    width: 33%;
-    vertical-align: top;
-    display: inline-block;
-    margin-left: 10px;
-
-    .transcript-settings-wrapper {
-      margin-top: 20px;
-    }
+  .course-video-settings-container {
+    position: fixed;
+    top: 0%;
+    right: 3%;
+    background-color: #f9f9f9;
 
     .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .transcript-languages-action-wrapper {
       display: none;
@@ -36,16 +32,46 @@
     .transcript-languages-wrapper {
       margin-top: 10px;
     }
+
+    .button-link {
+      background:none;
+      border:none;
+      padding:0;
+      color: $ui-link-color;
+      cursor:pointer
+    }
+
+    .action-close-wrapper {
+      padding: 10px 10px;
+      background-color: $gray-l3;
+      z-index: 10;
+      .action-close-course-video-settings {
+        width: 100%;
+        text-align: left;
+        background-color: transparent;
+        border: transparent;
+      }
+    }
+
+    .button {
+      @extend %btn-primary-blue;
+      @extend %sizing;
+
+      .action-button-text {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+
+      .icon {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+    }
   }
 
   .file-upload-form {
     @include clearfix();
     width: 100%;
-
-    &.video-transcript-enabled {
-      width: 65%;
-      display: inline-block;
-    }
 
     .file-drop-area {
       border: 2px dashed $gray-l3;

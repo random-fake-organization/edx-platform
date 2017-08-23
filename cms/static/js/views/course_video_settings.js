@@ -196,8 +196,8 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                             languageMenuId: totalCurrentLanguageMenus
                         }
                     ),
-                    HtmlUtils.HTML('<a href="#" class="action-select-language">Add</a>'),
-                    HtmlUtils.HTML('<a href="#" class="action-cancel-language">Cancel</a>'),
+                    HtmlUtils.HTML('<button class="button-link action-select-language">Add</button>'),
+                    HtmlUtils.HTML('<button class="button-link action-cancel-language">Cancel</button>'),
                     HtmlUtils.HTML('</div>')
                 )
             );
@@ -228,7 +228,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                                 }
                             ),
                             HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<a href="#" class="action-remove-language" data-language-code="{languageCode}">Remove</a>'),
+                                HtmlUtils.HTML('<button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button>'),
                                 {
                                     languageCode: activeLanguage
                                 }
@@ -257,7 +257,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                             }
                         ),
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<a href="#" class="action-remove-language" data-language-code="{languageCode}">Remove</a>'),
+                            HtmlUtils.HTML('<button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button>'),
                             {
                                 languageCode: selectedLanguage
                             }
