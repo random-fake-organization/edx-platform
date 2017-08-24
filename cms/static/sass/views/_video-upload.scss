@@ -21,17 +21,11 @@
 
   .course-video-settings-container {
     position: fixed;
-    top: 0%;
-    right: 3%;
+    top: 136px;
+    right: 1%;
     background-color: #f9f9f9;
-
-    .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .transcript-languages-action-wrapper {
-      display: none;
-    }
-
-    .transcript-languages-wrapper {
-      margin-top: 10px;
-    }
+    z-index: 1000;
+    width: 350px;
 
     .button-link {
       background:none;
@@ -42,15 +36,53 @@
     }
 
     .action-close-wrapper {
-      padding: 10px 10px;
+      padding: 10px 20px;
       background-color: $gray-l3;
-      z-index: 10;
       .action-close-course-video-settings {
         width: 100%;
         text-align: left;
         background-color: transparent;
         border: transparent;
       }
+    }
+
+    .course-video-settings-wrapper {
+      padding: 20px 20px;
+
+      .transcript-preferance-wrapper {
+        margin-top: 20px;
+      }
+
+      label {
+        display: block;
+        font-size: 1em;
+        margin-bottom: 5px;
+      }
+
+      .transcript-turnaround-wrapper, .transcript-fidelity-wrapper {
+        display: none;
+      }
+
+      .transcript-languages-container {
+        padding: 10px 20px;
+        .transcript-language-menu-container {
+          margin-top: 10px;
+          .language-actions {
+            display: inline-block;
+            float: right;
+            .action-select-language {
+              margin-right: 5px;
+            }
+          }
+        }
+        .action-add-language {
+          margin-top: 20px;
+        }
+      }
+    }
+
+    .course-video-settings-footer {
+      margin-top: 20px;
     }
 
     .button {

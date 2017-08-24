@@ -42,6 +42,20 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
             this.listenTo(Backbone, 'coursevideosettings:showCourseVideoSettingsView', this.render);
         },
 
+        registerClickHandler: function() {
+            var self = this;
+            self.$el.click(function(event){
+                event.stopPropagation();
+            });
+
+            $(document).click(function(){
+                // if the target of the click isn't the container nor a descendant of the contain
+                if (!self.$el.is(event.target) && self.$el.has(event.target).length === 0) {
+                    self.closeCourseVideoSettings();
+                }
+            });
+        },
+
         getProviderPlan: function() {
             return this.availableTranscriptionPlans;
         },
@@ -196,9 +210,10 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                             languageMenuId: totalCurrentLanguageMenus
                         }
                     ),
+                    HtmlUtils.HTML('<div class="language-actions">'),
                     HtmlUtils.HTML('<button class="button-link action-select-language">Add</button>'),
                     HtmlUtils.HTML('<button class="button-link action-cancel-language">Cancel</button>'),
-                    HtmlUtils.HTML('</div>')
+                    HtmlUtils.HTML('</div></div>')
                 )
             );
             $transcriptLanguage = this.$el.find('#transcript-language-menu-' + totalCurrentLanguageMenus);
@@ -228,7 +243,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                                 }
                             ),
                             HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button>'),
+                                HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button></div>'),
                                 {
                                     languageCode: activeLanguage
                                 }
@@ -241,7 +256,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
         },
 
         languageAdded: function(event) {
-            var $parentEl = $(event.target.parentElement),
+            var $parentEl = $(event.target.parentElement).parent(),
                 selectedLanguage = $parentEl.find('select').val();
 
             // Only add if not in the list already.
@@ -257,7 +272,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                             }
                         ),
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button>'),
+                            HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button></div>'),
                             {
                                 languageCode: selectedLanguage
                             }
@@ -268,12 +283,12 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
         },
 
         languageCancelled: function(event) {
-            $(event.target.parentElement).remove();
+            $(event.target.parentElement).parent().remove();
         },
 
         languageRemoved: function(event) {
             var selectedLanguage = $(event.target).data('language-code');
-            $(event.target.parentElement).remove();
+            $(event.target.parentElement).parent().remove();
             this.selectedLanguages.pop(selectedLanguage);
         },
 
@@ -311,6 +326,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                 // Add a language dropdown if active languages is empty.
                 this.addLanguageMenu();
             }
+            this.registerClickHandler();
             return this;
         }
     });

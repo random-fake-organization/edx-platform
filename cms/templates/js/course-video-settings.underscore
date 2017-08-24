@@ -9,19 +9,19 @@
     </div>
     <div class='course-video-settings-wrapper'>
         <span class="course-video-settings-title"><%- gettext('Course Video Settings') %></span>
-        <div class='transcript-provider-wrapper'>
+        <div class='transcript-preferance-wrapper transcript-provider-wrapper'>
             <label><%- gettext('Transcript provider: ') %></label>
             <select id='transcript-provider'></select>
         </div>
-        <div class='transcript-turnaround-wrapper'>
+        <div class='transcript-preferance-wrapper transcript-turnaround-wrapper'>
             <label><%- gettext('Transcript turnaround: ') %></label>
             <select id='transcript-turnaround'></select>
         </div>
-        <div class='transcript-fidelity-wrapper'>
+        <div class='transcript-preferance-wrapper transcript-fidelity-wrapper'>
             <label><%- gettext('Transcript fidelity: ') %></label>
             <select id='transcript-fidelity'></select>
         </div>
-        <div class='transcript-languages-wrapper'>
+        <div class='transcript-preferance-wrapper transcript-languages-wrapper'>
             <span>Transcript languages</span>
             <div class='transcript-languages-container'>
                 <div class='languages-menu-container'></div>

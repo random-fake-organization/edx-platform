@@ -70,12 +70,13 @@ define([
                 this.activeTranscriptPreferences = activeTranscriptPreferences;
             },
 
-            showCourseVideoSettingsView: function() {
+            showCourseVideoSettingsView: function(event) {
                 this.courseVideoSettingsView  = new CourseVideoSettingsView({
                     activeTranscriptPreferences: this.activeTranscriptPreferences,
                     videoTranscriptSettings: this.videoTranscriptSettings
                 });
                 Backbone.trigger('coursevideosettings:showCourseVideoSettingsView');
+                event.stopPropagation();
             },
 
             destroyCourseVideoSettingsView: function() {
