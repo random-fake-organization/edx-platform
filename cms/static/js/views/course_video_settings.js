@@ -132,7 +132,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
             // if previously languages were shown, and now a different turnaround/fidelity is selected, update language options too
 
             // Provider dropdown
-            $provider.empty().append(new Option('Select provider', ''));
+            $provider.empty().append(new Option(gettext('Select provider'), ''));
             _.each(providerPlan, function(providerObject, key){
                 var option = new Option(providerObject.display_name, key);
                 if (self.selectedProvider === key) {
@@ -143,7 +143,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
 
             if(turnaroundPlan) {
                 // Turnaround dropdown
-                $turnaround.empty().append(new Option('Select turnaround', ''));
+                $turnaround.empty().append(new Option(gettext('Select turnaround'), ''));
                 _.each(turnaroundPlan, function (value, key) {
                     var option = new Option(value, key);
                     if (self.selectedTurnaroundPlan === key) {
@@ -156,7 +156,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
 
             // Fidelity dropdown
             if (fidelityPlan) {
-                $fidelity.empty().append(new Option('Select fidelity', ''));
+                $fidelity.empty().append(new Option(gettext('Select fidelity'), ''));
                 _.each(fidelityPlan, function(fidelityObject, key){
                     var option = new Option(fidelityObject.display_name, key);
                     if (self.selectedFidelityPlan === key) {
@@ -211,8 +211,20 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                         }
                     ),
                     HtmlUtils.HTML('<div class="language-actions">'),
-                    HtmlUtils.HTML('<button class="button-link action-select-language">Add</button>'),
-                    HtmlUtils.HTML('<button class="button-link action-cancel-language">Cancel</button>'),
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<button class="button-link action-select-language">{text}<span class="sr">{srText}</span></button>'),
+                        {
+                            text: gettext('Add'),
+                            srText: gettext('Press Add to language')
+                        }
+                    ),
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<button class="button-link action-cancel-language">{text}<span class="sr">{srText}</span></button>'),
+                        {
+                            text: gettext('Cancel'),
+                            srText: gettext('Press Cancel to cancel add language menu')
+                        }
+                    ),
                     HtmlUtils.HTML('</div></div>')
                 )
             );
@@ -243,9 +255,11 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                                 }
                             ),
                             HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button></div>'),
+                                HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
                                 {
-                                    languageCode: activeLanguage
+                                    languageCode: activeLanguage,
+                                    text: gettext('Remove'),
+                                    srText: gettext('Press Remove to remove language')
                                 }
                             ),
                             HtmlUtils.HTML('</div>')
@@ -272,9 +286,11 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
                             }
                         ),
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">Remove</button></div>'),
+                            HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
                             {
-                                languageCode: selectedLanguage
+                                languageCode: selectedLanguage,
+                                text: gettext('Remove'),
+                                srText: gettext('Press Remove to remove language')
                             }
                         )
                     )

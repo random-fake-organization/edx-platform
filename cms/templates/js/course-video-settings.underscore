@@ -4,21 +4,22 @@
             <button class="action-close-course-video-settings">
                 <span class="icon fa fa-times" aria-hidden="true"></span>
                 <%-gettext('Close') %>
+                <span class='sr'><%-gettext('Press close to hide course video settings') %></span>
             </button>
         </div>
     </div>
     <div class='course-video-settings-wrapper'>
         <span class="course-video-settings-title"><%- gettext('Course Video Settings') %></span>
         <div class='transcript-preferance-wrapper transcript-provider-wrapper'>
-            <label><%- gettext('Transcript provider: ') %></label>
+            <label for='transcript-provider'><%- gettext('Transcript provider: ') %></label>
             <select id='transcript-provider'></select>
         </div>
         <div class='transcript-preferance-wrapper transcript-turnaround-wrapper'>
-            <label><%- gettext('Transcript turnaround: ') %></label>
+            <label for='transcript-turnaround'><%- gettext('Transcript turnaround: ') %></label>
             <select id='transcript-turnaround'></select>
         </div>
         <div class='transcript-preferance-wrapper transcript-fidelity-wrapper'>
-            <label><%- gettext('Transcript fidelity: ') %></label>
+            <label for='transcript-fidelity'><%- gettext('Transcript fidelity: ') %></label>
             <select id='transcript-fidelity'></select>
         </div>
         <div class='transcript-preferance-wrapper transcript-languages-wrapper'>
@@ -29,7 +30,10 @@
             </div>
         </div>
         <div class='course-video-settings-footer'>
-            <button class="button button action-update-course-video-settings"><%- gettext('Update Settings') %></button>
+            <button class="button button action-update-course-video-settings">
+                <%- gettext('Update Settings') %>
+                <span class='sr'><%-gettext('Press update settings to update course video settings') %></span>
+            </button>
         </div>
     </div>
 </div>
