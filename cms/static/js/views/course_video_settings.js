@@ -403,9 +403,20 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         updateCourseVideoSettings: function(event) {
+            var $successEl = this.$el.find('.course-video-settings-success-wrapper');
             if(this.validateCourseVideoSettings()) {
                 this.saveTranscriptPreferences();
-                // TODO: add settings updated.
+                HtmlUtils.setHtml(
+                    $successEl,
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<div class="course-video-settings-success"><span class="icon fa fa-check-circle" aria-hidden="true"></span><span>{text}</span></div>'),
+                        {
+                            text: gettext('Settings updated')
+                        }
+                    )
+                );
+            } else {
+                $successEl.empty();
             }
         },
 

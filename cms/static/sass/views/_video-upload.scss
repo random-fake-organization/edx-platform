@@ -49,6 +49,15 @@
     .course-video-settings-wrapper {
       padding: 20px 20px;
 
+      .course-video-settings-success {
+        background-color: $color-ready;
+        padding: 10px;
+        margin-bottom: 20px;
+        .fa-check-circle {
+          margin-right: 5px;
+        }
+      }
+
       .transcript-preferance-wrapper {
         margin-top: 20px;
         .icon.fa-info-circle {
