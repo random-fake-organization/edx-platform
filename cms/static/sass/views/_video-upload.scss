@@ -19,10 +19,16 @@
     font-weight: 600
   }
 
-  .course-video-settings-container {
+  .fixed-container {
     position: fixed;
-    top: 136px;
-    right: 1%;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  .course-video-settings-container {
+    position: absolute;
+    top: 0;
+    right: 0;
     background-color: #f9f9f9;
     z-index: 1000;
     width: 350px;

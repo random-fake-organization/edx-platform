@@ -32,6 +32,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
             this.videoTranscriptEnabled = !_.isEmpty(this.activeTranscriptionPlan) || !_.isEmpty(this.availableTranscriptionPlans) ? true : false;
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
+            this.initialOffset = null;
             this.selectedProvider = '';
             this.selectedTurnaroundPlan = '';
             this.selectedFidelityPlan = '';
@@ -52,6 +53,18 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 // if the target of the click isn't the container nor a descendant of the contain
                 if (!self.$el.is(event.target) && self.$el.has(event.target).length === 0) {
                     self.closeCourseVideoSettings();
+                }
+            });
+        },
+
+        setFixedCourseVideoSettingsPane: function() {
+            var self = this;
+            $(window).scroll(function(){
+                if ($(window).scrollTop() >= self.initialOffset) {
+                   self.$el.addClass('fixed-container');
+                }
+                else {
+                   self.$el.removeClass('fixed-container');
                 }
             });
         },
@@ -440,6 +453,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 this.addLanguageMenu();
             }
             this.registerClickHandler();
+            this.initialOffset = this.$el.offset().top;
+            this.setFixedCourseVideoSettingsPane();
             return this;
         }
     });

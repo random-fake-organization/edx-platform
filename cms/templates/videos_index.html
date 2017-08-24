@@ -48,6 +48,7 @@
 <%block name="content">
 
 <div class="wrapper-mast wrapper">
+    <div class="video-transcript-settings-wrapper"></div>
     <header class="mast has-actions has-subtitle">
         <h1 class="page-header">
             <small class="subtitle">${_("Content")}</small>
@@ -67,7 +68,6 @@
 
 <div class="wrapper-content wrapper">
     <section class="content">
-        <div class="video-transcript-settings-wrapper"></div>
         <article class="content-primary" role="main" data-previous-uploads="${json.dumps(previous_uploads, cls=DjangoJSONEncoder)}"></article>
     </section>
 </div>
