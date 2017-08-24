@@ -2,12 +2,12 @@
  * CourseVideoSettingsView shows a sidebar containing course wide video settings.
  */
 define([
-    'jquery', 'backbone', 'underscore', 'gettext',
+    'jquery', 'backbone', 'underscore', 'gettext', 'moment',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/course-video-settings.underscore'
 ],
-function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemplate) {
+function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSettingsTemplate) {
     'use strict';
 
     var CourseVideoSettingsView = Backbone.View.extend({
@@ -321,15 +321,101 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, TranscriptSettingsTemp
             this.selectedLanguages = [];
         },
 
-        updateCourseVideoSettings: function(event) {
-            this.saveTranscriptPreferences();
-            this.closeCourseVideoSettings();
+        validateCourseVideoSettings: function() {
+            var isValid = true,
+                $providerEl = this.$el.find('.transcript-provider-wrapper'),
+                $turnaroundEl = this.$el.find('.transcript-turnaround-wrapper'),
+                $fidelityEl = this.$el.find('.transcript-fidelity-wrapper'),
+                $languagesEl = this.$el.find('.transcript-languages-wrapper'),
+                requiredText = gettext('Required'),
+                infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
+            if(!this.selectedProvider) {
+                isValid = false;
+                $providerEl.addClass('error');
+                HtmlUtils.setHtml(
+                    $providerEl.find('.error-icon'),
+                    infoIconHtml
+                );
+                HtmlUtils.setHtml(
+                    $providerEl.find('.error-info'),
+                    requiredText
+                );
+            } else {
+                $providerEl.removeClass('error');
+                $providerEl.find('.error-icon').empty();
+                $providerEl.find('.error-info').empty();
+            }
+
+            if (!this.selectedTurnaroundPlan){
+                isValid = false;
+                $turnaroundEl.addClass('error');
+                HtmlUtils.setHtml(
+                    $turnaroundEl.find('.error-icon'),
+                    infoIconHtml
+                );
+                HtmlUtils.setHtml(
+                    $turnaroundEl.find('.error-info'),
+                    requiredText
+                );
+            } else {
+                $turnaroundEl.removeClass('error');
+                $turnaroundEl.find('.error-icon').empty();
+                $turnaroundEl.find('.error-info').empty();
+            }
+
+
+            if (this.selectedProvider === 'Cielo24' && !this.selectedFidelityPlan) {
+                isValid = false;
+                $fidelityEl.addClass('error');
+                HtmlUtils.setHtml(
+                    $fidelityEl.find('.error-icon'),
+                    infoIconHtml
+                );
+                HtmlUtils.setHtml(
+                    $fidelityEl.find('.error-info'),
+                    requiredText
+                );
+            } else {
+                $fidelityEl.removeClass('error');
+                $fidelityEl.find('.error-icon').empty();
+                $fidelityEl.find('.error-info').empty();
+            }
+
+
+            if (this.selectedLanguages.length === 0) {
+                isValid = false;
+                $languagesEl.addClass('error');
+                HtmlUtils.setHtml(
+                    $languagesEl.find('.error-icon'),
+                    infoIconHtml
+                );
+                HtmlUtils.setHtml(
+                    $languagesEl.find('.error-info'),
+                    requiredText
+                );
+            } else {
+                $languagesEl.removeClass('error');
+                $languagesEl.find('.error-icon').empty();
+                $languagesEl.find('.error-info').empty();
+            }
+
+            return isValid;
         },
 
-        render: function(options) {
+        updateCourseVideoSettings: function(event) {
+            if(this.validateCourseVideoSettings()) {
+                this.saveTranscriptPreferences();
+                // TODO: add settings updated.
+            }
+        },
+
+        render: function() {
+            var dateModified = this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
             HtmlUtils.setHtml(
                 this.$el,
-                this.template(options)
+                this.template({
+                    dateModified: dateModified
+                })
             );
             // populate video transcript
             if (this.videoTranscriptEnabled){

@@ -36,10 +36,10 @@
     }
 
     .action-close-wrapper {
-      padding: 10px 20px;
       background-color: $gray-l3;
       .action-close-course-video-settings {
         width: 100%;
+        padding: 10px 20px;
         text-align: left;
         background-color: transparent;
         border: transparent;
@@ -51,6 +51,20 @@
 
       .transcript-preferance-wrapper {
         margin-top: 20px;
+        .icon.fa-info-circle {
+          margin-left: 5px;
+        }
+      }
+      .transcript-preferance-wrapper.error .transcript-preferance-label {
+        color: $color-error;
+      }
+
+      .error-info, .fa-info-circle {
+        color: $color-error;
+      }
+
+      .error-info {
+        font-size: 0.75em;
       }
 
       label {
@@ -83,6 +97,10 @@
 
     .course-video-settings-footer {
       margin-top: 20px;
+      .last-updated-text {
+        font-size: 0.75em;
+        margin-left: 5px;
+      }
     }
 
     .button {
