@@ -32,7 +32,6 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
             this.videoTranscriptEnabled = !_.isEmpty(this.activeTranscriptionPlan) || !_.isEmpty(this.availableTranscriptionPlans) ? true : false;
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
-            this.initialOffset = null;
             this.selectedProvider = '';
             this.selectedTurnaroundPlan = '';
             this.selectedFidelityPlan = '';
@@ -58,13 +57,31 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         setFixedCourseVideoSettingsPane: function() {
-            var self = this;
+            var self = this,
+                windowWidth = $(window).width(),
+                windowHeight = $(window).height(),
+                $courseVideoSettingsButton = $('.course-video-settings-button'),
+                $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
+                initialPositionTop = $courseVideoSettingsContainer.offset().top,
+                initialPositionLeft = $courseVideoSettingsContainer.offset().left,
+                courseVideoSettingsButtonTop = $courseVideoSettingsButton.position().top,
+                courseVideoSettingsButtonLeft = $courseVideoSettingsButton.offset().left,
+                fixedOffsetRight = windowWidth - courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 20;
+
+            // set windows total height
+            $courseVideoSettingsContainer.css('height', windowHeight);
+            //$courseVideoSettingsContainer.css('right', fixedOffsetRight - $courseVideoSettingsButton.width() + 10);
+            $courseVideoSettingsContainer.css('right', 0);
+
+
+            // Make sticky when scroll reaches top
             $(window).scroll(function(){
-                if ($(window).scrollTop() >= self.initialOffset) {
-                   self.$el.addClass('fixed-container');
-                }
-                else {
-                   self.$el.removeClass('fixed-container');
+                if ($(window).scrollTop() >= initialPositionTop) {
+                   $courseVideoSettingsContainer.addClass('fixed-container');
+                   $courseVideoSettingsContainer.css('right', fixedOffsetRight);
+                } else {
+                   $courseVideoSettingsContainer.removeClass('fixed-container');
+                   $courseVideoSettingsContainer.css('right', fixedOffsetRight - $courseVideoSettingsButton.width() + 10);
                 }
             });
         },
@@ -328,6 +345,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             // Unbind any events associated
             this.undelegateEvents();
 
+            // Slide back to right
+            this.$el.find('.course-video-settings-container').css('right', '-100%');
+
             // Empty this.$el content from DOM
             this.$el.empty();
 
@@ -453,7 +473,6 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 this.addLanguageMenu();
             }
             this.registerClickHandler();
-            this.initialOffset = this.$el.offset().top;
             this.setFixedCourseVideoSettingsPane();
             return this;
         }
