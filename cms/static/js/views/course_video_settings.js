@@ -111,6 +111,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
         languageAdded: function(event) {
             var $parentEl = $(event.target.parentElement).parent(),
+                $languagesEl = this.$el.find('.transcript-languages-wrapper'),
                 selectedLanguage = $parentEl.find('select').val();
 
             // Only add if not in the list already.
@@ -135,7 +136,23 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                         )
                     )
                 );
+
+                // Add a new language menu
                 this.addLanguageMenu();
+
+                // Remove any error if present already.
+                $languagesEl.removeClass('error');
+                $languagesEl.find('.error-icon').empty();
+            } else {
+                $languagesEl.addClass('error');
+                HtmlUtils.setHtml(
+                    $languagesEl.find('.error-icon'),
+                    infoIconHtml
+                );
+                HtmlUtils.setHtml(
+                    $languagesEl.find('.error-info'),
+                    requiredText
+                );
             }
         },
 
@@ -340,12 +357,10 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             // Unbind any events associated
             this.undelegateEvents();
 
-            // Slide back to right
-            this.$el.find('.course-video-settings-container').css('right', '-100%');
-
             // Empty this.$el content from DOM
             this.$el.empty();
 
+            // TODO: may be do this: this.resetPlanData();
             this.selectedLanguages = [];
         },
 
@@ -479,8 +494,15 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             $courseVideoSettingsContainer.css('right', 20);
 
 
-            // Make sticky when scroll reaches top
+            // Make sticky when scroll reaches top.
             $(window).scroll(function(){
+
+                // Remove transition when we start scrolling.
+                // Why we do this? The settings pane does some back and forth movemment when it is switched between
+                // position:fixed and position:absolute, it's right and top position are then being changed wrt to their
+                // position layout.
+                $courseVideoSettingsContainer.css('transition', 'none');
+
                 if ($(window).scrollTop() >= initialPositionTop) {
                     $courseVideoSettingsContainer.addClass('fixed-container');
                     $courseVideoSettingsContainer.css('right', fixedOffsetRight);
