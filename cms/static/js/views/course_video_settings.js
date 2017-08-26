@@ -14,12 +14,10 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         el: 'div.video-transcript-settings-wrapper',
 
         events: {
-            'change #transcript-provider': 'providerSelected',
+            'change .transcript-provider-group input': 'providerSelected',
             'change #transcript-turnaround': 'turnaroundSelected',
             'change #transcript-fidelity': 'fidelitySelected',
-            'click .action-add-language': 'addLanguageMenu',
-            'click .action-select-language': 'languageAdded',
-            'click .action-cancel-language': 'languageCancelled',
+            'click .action-add-language': 'languageAdded',
             'click .action-remove-language': 'languageRemoved',
             'click .action-update-course-video-settings': 'updateCourseVideoSettings',
             'click .action-close-course-video-settings': 'closeCourseVideoSettings'
@@ -30,15 +28,10 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.activeTranscriptionPlan = options.activeTranscriptPreferences;
             this.availableTranscriptionPlans = videoTranscriptSettings['transcription_plans'];
             this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
-            this.videoTranscriptEnabled = !_.isEmpty(this.activeTranscriptionPlan) || !_.isEmpty(this.availableTranscriptionPlans) ? true : false;
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
-            this.selectedProvider = '';
-            this.selectedTurnaroundPlan = '';
-            this.selectedFidelityPlan = '';
-            this.availableLanguages = [];
-            this.activeLanguages = [];
+            this.resetPlanData();
             this.selectedLanguages = [];
-            this.setTranscriptData();
+            this.setActiveTranscriptPlanData();
             this.listenTo(Backbone, 'coursevideosettings:showCourseVideoSettingsView', this.render);
         },
 
@@ -56,34 +49,22 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             });
         },
 
-        setFixedCourseVideoSettingsPane: function() {
-            var self = this,
-                windowWidth = $(window).width(),
-                windowHeight = $(window).height(),
-                $courseVideoSettingsButton = $('.course-video-settings-button'),
-                $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
-                initialPositionTop = $courseVideoSettingsContainer.offset().top,
-                initialPositionLeft = $courseVideoSettingsContainer.offset().left,
-                courseVideoSettingsButtonTop = $courseVideoSettingsButton.position().top,
-                courseVideoSettingsButtonLeft = $courseVideoSettingsButton.offset().left,
-                fixedOffsetRight = windowWidth - courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 20;
+        resetPlanData: function() {
+            this.selectedProvider = '';
+            this.selectedTurnaroundPlan = '';
+            this.selectedFidelityPlan = '';
+            this.availableLanguages = [];
+            this.activeLanguages = [];
+            this.selectedLanguages = [];
+        },
 
-            // set windows total height
-            $courseVideoSettingsContainer.css('height', windowHeight);
-            //$courseVideoSettingsContainer.css('right', fixedOffsetRight - $courseVideoSettingsButton.width() + 10);
-            $courseVideoSettingsContainer.css('right', 0);
-
-
-            // Make sticky when scroll reaches top
-            $(window).scroll(function(){
-                if ($(window).scrollTop() >= initialPositionTop) {
-                   $courseVideoSettingsContainer.addClass('fixed-container');
-                   $courseVideoSettingsContainer.css('right', fixedOffsetRight);
-                } else {
-                   $courseVideoSettingsContainer.removeClass('fixed-container');
-                   $courseVideoSettingsContainer.css('right', fixedOffsetRight - $courseVideoSettingsButton.width() + 10);
-                }
-            });
+        setActiveTranscriptPlanData: function(){
+            if (this.activeTranscriptionPlan) {
+                this.selectedProvider = this.activeTranscriptionPlan['provider'];
+                this.selectedFidelityPlan = this.activeTranscriptionPlan['cielo24_fidelity'];
+                this.selectedTurnaroundPlan = this.activeTranscriptionPlan['cielo24_turnaround'] ? this.activeTranscriptionPlan['cielo24_turnaround']: this.activeTranscriptionPlan['three_play_turnaround'];
+                this.activeLanguages = this.activeTranscriptionPlan['preferred_languages'];
+            }
         },
 
         getProviderPlan: function() {
@@ -114,65 +95,95 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
         fidelitySelected: function(event) {
             this.selectedFidelityPlan = event.target.value;
-            this.manageLanguageContainer();
+            this.populateLanguages();
         },
 
         turnaroundSelected: function(event) {
             this.selectedTurnaroundPlan = event.target.value;
-            this.manageLanguageContainer();
+            this.populateLanguages();
         },
 
         providerSelected: function(event) {
+            this.resetPlanData();
             this.selectedProvider = event.target.value;
-            this.populatePreferenceOptions();
+            this.populatePreferences();
         },
 
-        manageLanguageContainer: function() {
-            var isTurnaroundSelected = this.$el.find('#transcript-turnaround')[0].options.selectedIndex,
-                isFidelitySelected = this.$el.find('#transcript-fidelity')[0].options.selectedIndex;
+        languageAdded: function(event) {
+            var $parentEl = $(event.target.parentElement).parent(),
+                selectedLanguage = $parentEl.find('select').val();
 
-            if ((isTurnaroundSelected > 0 && this.selectedProvider === '3PlayMedia') || (isTurnaroundSelected  > 0 && isFidelitySelected > 0)) {
-                this.availableLanguages = this.getPlanLanguages();
-                this.$el.find('.transcript-languages-wrapper').show();
-            } else {
-                this.availableLanguages = {};
-                this.$el.find('.transcript-languages-wrapper').hide();
+            // Only add if not in the list already.
+            if (selectedLanguage && _.indexOf(this.selectedLanguages, selectedLanguage) === -1) {
+                this.selectedLanguages.push(selectedLanguage);
+                HtmlUtils.setHtml(
+                    $parentEl,
+                    HtmlUtils.joinHtml(
+                        HtmlUtils.interpolateHtml(
+                            HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
+                            {
+                                languageDisplayName: this.availableLanguages[selectedLanguage]
+                            }
+                        ),
+                        HtmlUtils.interpolateHtml(
+                            HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
+                            {
+                                languageCode: selectedLanguage,
+                                text: gettext('Remove'),
+                                srText: gettext('Press Remove to remove language')
+                            }
+                        )
+                    )
+                );
+                this.addLanguageMenu();
             }
         },
 
-        setTranscriptData: function(){
-            if (this.activeTranscriptionPlan) {
-                this.selectedProvider = this.activeTranscriptionPlan['provider'];
-                this.selectedFidelityPlan = this.activeTranscriptionPlan['cielo24_fidelity'];
-                this.selectedTurnaroundPlan = this.activeTranscriptionPlan['cielo24_turnaround'] ? this.activeTranscriptionPlan['cielo24_turnaround']: this.activeTranscriptionPlan['three_play_turnaround'];
-                this.activeLanguages = this.activeTranscriptionPlan['preferred_languages'];
-            }
+        languageRemoved: function(event) {
+            var selectedLanguage = $(event.target).data('language-code');
+            $(event.target.parentElement).parent().remove();
+            this.selectedLanguages.pop(selectedLanguage);
         },
 
-        populatePreferenceOptions: function() {
+        populateProvider: function() {
             var self = this,
                 providerPlan = self.getProviderPlan(),
-                turnaroundPlan = self.getTurnaroundPlan(),
-                fidelityPlan = self.getFidelityPlan(),
-                $provider = self.$el.find('#transcript-provider'),
-                $turnaround = self.$el.find('#transcript-turnaround'),
-                $fidelity = self.$el.find('#transcript-fidelity');
-
-            // TODO: Hide un-related things in None provider selected even if they were selected before.
-            // if previously languages were shown, and now a different turnaround/fidelity is selected, update language options too
-
+                $providerEl = self.$el.find('.transcript-provider-group');
             // Provider dropdown
-            $provider.empty().append(new Option(gettext('Select provider'), ''));
-            _.each(providerPlan, function(providerObject, key){
-                var option = new Option(providerObject.display_name, key);
-                if (self.selectedProvider === key) {
-                    option.selected = true;
-                }
-                $provider.append(option);
-            });
+            $providerEl.empty();
+            HtmlUtils.setHtml(
+                $providerEl,
+                HtmlUtils.interpolateHtml(
+                    HtmlUtils.HTML('<input type="radio" name="transcript-provider" value="" {checked}/>{text}'),
+                    {
+                        text: gettext('None'),
+                        checked: self.selectedProvider === '' ? 'checked' : ''
+                    }
+                )
+            );
 
-            if(turnaroundPlan) {
-                // Turnaround dropdown
+            _.each(providerPlan, function(providerObject, key){
+                var checked = self.selectedProvider === key ? 'checked' : '';
+                HtmlUtils.append(
+                    $providerEl,
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<input type="radio" name="transcript-provider" value="{value}" {checked}/>{text}'),
+                        {
+                            text: providerObject.display_name,
+                            value: key,
+                            checked: checked
+                        }
+                    )
+                )
+            });
+        },
+
+        populateTurnaround: function() {
+            var self = this,
+                turnaroundPlan = self.getTurnaroundPlan(),
+                $turnaround = self.$el.find('#transcript-turnaround');
+
+            if(self.selectedProvider && turnaroundPlan) {
                 $turnaround.empty().append(new Option(gettext('Select turnaround'), ''));
                 _.each(turnaroundPlan, function (value, key) {
                     var option = new Option(value, key);
@@ -182,10 +193,18 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     $turnaround.append(option);
                 });
                 self.$el.find('.transcript-turnaround-wrapper').show();
+            } else {
+                self.$el.find('.transcript-turnaround-wrapper').hide();
             }
+        },
+
+        populateFidelity: function() {
+            var self = this,
+                fidelityPlan = self.getFidelityPlan(),
+                $fidelity = self.$el.find('#transcript-fidelity');
 
             // Fidelity dropdown
-            if (fidelityPlan) {
+            if (self.selectedProvider &&fidelityPlan) {
                 $fidelity.empty().append(new Option(gettext('Select fidelity'), ''));
                 _.each(fidelityPlan, function(fidelityObject, key){
                     var option = new Option(fidelityObject.display_name, key);
@@ -198,8 +217,62 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             } else {
                 self.$el.find('.transcript-fidelity-wrapper').hide();
             }
+        },
 
-            self.manageLanguageContainer();
+        populateLanguages: function() {
+            var self = this,
+                $languagesContainer = self.$el.find('.languages-menu-container'),
+                isTurnaroundSelected = self.$el.find('#transcript-turnaround')[0].options.selectedIndex,
+                isFidelitySelected = self.$el.find('#transcript-fidelity')[0].options.selectedIndex;
+
+            $languagesContainer.empty();
+
+            if (self.selectedProvider &&
+                    ((isTurnaroundSelected > 0 && self.selectedProvider === '3PlayMedia') ||
+                    (isTurnaroundSelected  > 0 && isFidelitySelected > 0))) {
+                self.availableLanguages = self.getPlanLanguages();
+                _.each(self.activeLanguages, function(activeLanguage){
+                    // Only add if not in the list already.
+                    if (_.indexOf(self.selectedLanguages, activeLanguage) === -1) {
+                        self.selectedLanguages.push(activeLanguage);
+                        HtmlUtils.append(
+                            $languagesContainer,
+                            HtmlUtils.joinHtml(
+                                HtmlUtils.HTML('<div class="transcript-language-menu-container">'),
+                                HtmlUtils.interpolateHtml(
+                                    HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
+                                    {
+                                        languageDisplayName: self.availableLanguages[activeLanguage]
+                                    }
+                                ),
+                                HtmlUtils.interpolateHtml(
+                                    HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
+                                    {
+                                        languageCode: activeLanguage,
+                                        text: gettext('Remove'),
+                                        srText: gettext('Press Remove to remove language')
+                                    }
+                                ),
+                                HtmlUtils.HTML('</div>')
+                            )
+                        );
+                    }
+                });
+
+                self.addLanguageMenu();
+
+                self.$el.find('.transcript-languages-wrapper').show();
+            } else {
+                self.availableLanguages = {};
+                self.$el.find('.transcript-languages-wrapper').hide();
+            }
+        },
+
+        populatePreferences: function() {
+            this.populateProvider();
+            this.populateTurnaround();
+            this.populateFidelity();
+            this.populateLanguages();
         },
 
         saveTranscriptPreferences: function() {
@@ -240,102 +313,24 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                             languageMenuId: totalCurrentLanguageMenus
                         }
                     ),
-                    HtmlUtils.HTML('<div class="language-actions">'),
+                    HtmlUtils.HTML('<div class="add-language-action">'),
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<button class="button-link action-select-language">{text}<span class="sr">{srText}</span></button>'),
+                        HtmlUtils.HTML('<button class="button-link action-add-language">{text}<span class="sr">{srText}</span></button>'),
                         {
                             text: gettext('Add'),
                             srText: gettext('Press Add to language')
                         }
                     ),
-                    HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<button class="button-link action-cancel-language">{text}<span class="sr">{srText}</span></button>'),
-                        {
-                            text: gettext('Cancel'),
-                            srText: gettext('Press Cancel to cancel add language menu')
-                        }
-                    ),
+                    HtmlUtils.HTML('<span class="error-info" aria-hidden="true"></span>'),
                     HtmlUtils.HTML('</div></div>')
                 )
             );
             $transcriptLanguage = this.$el.find('#transcript-language-menu-' + totalCurrentLanguageMenus);
 
-            $transcriptLanguage.append(new Option('Choose a language', ''));
+            $transcriptLanguage.append(new Option(gettext('Choose a language'), ''));
             _.each(availableLanguages, function(value, key){
                 $transcriptLanguage.append(new Option(value, key));
             });
-        },
-
-        setActiveLanguages: function() {
-            var self = this,
-                $languagesContainer = this.$el.find('.languages-menu-container');
-
-            _.each(this.activeLanguages, function(activeLanguage){
-                // Only add if not in the list already.
-                if (_.indexOf(self.selectedLanguages, activeLanguage) === -1) {
-                    self.selectedLanguages.push(activeLanguage);
-                    HtmlUtils.append(
-                        $languagesContainer,
-                        HtmlUtils.joinHtml(
-                            HtmlUtils.HTML('<div class="transcript-language-menu-container">'),
-                            HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
-                                {
-                                    languageDisplayName: self.availableLanguages[activeLanguage]
-                                }
-                            ),
-                            HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
-                                {
-                                    languageCode: activeLanguage,
-                                    text: gettext('Remove'),
-                                    srText: gettext('Press Remove to remove language')
-                                }
-                            ),
-                            HtmlUtils.HTML('</div>')
-                        )
-                    );
-                }
-            });
-        },
-
-        languageAdded: function(event) {
-            var $parentEl = $(event.target.parentElement).parent(),
-                selectedLanguage = $parentEl.find('select').val();
-
-            // Only add if not in the list already.
-            if (selectedLanguage && _.indexOf(this.selectedLanguages, selectedLanguage) === -1) {
-                this.selectedLanguages.push(selectedLanguage);
-                HtmlUtils.setHtml(
-                    $parentEl,
-                    HtmlUtils.joinHtml(
-                        HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
-                            {
-                                languageDisplayName: this.availableLanguages[selectedLanguage]
-                            }
-                        ),
-                        HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="language-actions"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
-                            {
-                                languageCode: selectedLanguage,
-                                text: gettext('Remove'),
-                                srText: gettext('Press Remove to remove language')
-                            }
-                        )
-                    )
-                )
-            }
-        },
-
-        languageCancelled: function(event) {
-            $(event.target.parentElement).parent().remove();
-        },
-
-        languageRemoved: function(event) {
-            var selectedLanguage = $(event.target).data('language-code');
-            $(event.target.parentElement).parent().remove();
-            this.selectedLanguages.pop(selectedLanguage);
         },
 
         closeCourseVideoSettings: function(event) {
@@ -461,20 +456,39 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     dateModified: dateModified
                 })
             );
-            // populate video transcript
-            if (this.videoTranscriptEnabled){
-                this.populatePreferenceOptions();
-            }
 
-            if (this.activeLanguages) {
-                this.setActiveLanguages();
-            } else {
-                // Add a language dropdown if active languages is empty.
-                this.addLanguageMenu();
-            }
+            this.populatePreferences();
+
             this.registerClickHandler();
             this.setFixedCourseVideoSettingsPane();
             return this;
+        },
+
+        setFixedCourseVideoSettingsPane: function() {
+            var self = this,
+                windowWidth = $(window).width(),
+                windowHeight = $(window).height(),
+                $courseVideoSettingsButton = $('.course-video-settings-button'),
+                $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
+                initialPositionTop = $courseVideoSettingsContainer.offset().top,
+                courseVideoSettingsButtonLeft = $courseVideoSettingsButton.offset().left,
+                fixedOffsetRight = windowWidth - courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 25;
+
+            // set windows total height
+            $courseVideoSettingsContainer.css('height', windowHeight);
+            $courseVideoSettingsContainer.css('right', 20);
+
+
+            // Make sticky when scroll reaches top
+            $(window).scroll(function(){
+                if ($(window).scrollTop() >= initialPositionTop) {
+                    $courseVideoSettingsContainer.addClass('fixed-container');
+                    $courseVideoSettingsContainer.css('right', fixedOffsetRight);
+                } else {
+                    $courseVideoSettingsContainer.removeClass('fixed-container');
+                    $courseVideoSettingsContainer.css('right', 20);
+                }
+            });
         }
     });
 
