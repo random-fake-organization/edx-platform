@@ -55,13 +55,20 @@
     .course-video-settings-wrapper {
       padding: 20px 20px;
 
-      .course-video-settings-success {
-        background-color: $color-ready;
+      .course-video-settings-success, .course-video-settings-error {
         padding: 10px;
         margin-bottom: 20px;
-        .fa-check-circle {
+        .icon {
           margin-right: 5px;
         }
+      }
+
+      .course-video-settings-success {
+        background-color: $color-ready;
+      }
+
+      .course-video-settings-error {
+        background-color: $color-error;
       }
 
       .transcript-preferance-wrapper {

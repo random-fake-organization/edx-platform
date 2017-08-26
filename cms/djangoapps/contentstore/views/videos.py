@@ -340,6 +340,9 @@ def transcript_preferences_handler(request, course_key_string):
     data = request.json
     provider = data.get('provider', '')
 
+    # TODO: if provider == '': delete course preferences
+    # i.e call delete api end point like delete_transcript_preferences(course_key_string)
+
     error, preferences = validate_transcript_preferences(
         provider=provider,
         cielo24_fidelity=data.get('cielo24_fidelity', ''),
