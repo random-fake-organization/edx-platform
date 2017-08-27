@@ -29,9 +29,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.availableTranscriptionPlans = videoTranscriptSettings['transcription_plans'];
             this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
-            this.resetPlanData();
-            this.selectedLanguages = [];
             this.setActiveTranscriptPlanData();
+            this.selectedLanguages = [];
             this.listenTo(Backbone, 'coursevideosettings:showCourseVideoSettingsView', this.render);
         },
 
@@ -64,6 +63,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 this.selectedFidelityPlan = this.activeTranscriptionPlan['cielo24_fidelity'];
                 this.selectedTurnaroundPlan = this.selectedProvider === 'Cielo24' ? this.activeTranscriptionPlan['cielo24_turnaround']: this.activeTranscriptionPlan['three_play_turnaround'];
                 this.activeLanguages = this.activeTranscriptionPlan['preferred_languages'];
+            } else {
+                this.resetPlanData();
             }
         },
 
@@ -112,7 +113,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         languageAdded: function(event) {
             var $parentEl = $(event.target.parentElement).parent(),
                 $languagesEl = this.$el.find('.transcript-languages-wrapper'),
-                selectedLanguage = $parentEl.find('select').val();
+                selectedLanguage = $parentEl.find('select').val(),
+                requiredText = gettext('Required'),
+                infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
 
             // Only add if not in the list already.
             if (selectedLanguage && _.indexOf(this.selectedLanguages, selectedLanguage) === -1) {
@@ -141,8 +144,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 this.addLanguageMenu();
 
                 // Remove any error if present already.
-                $languagesEl.removeClass('error');
-                $languagesEl.find('.error-icon').empty();
+                this.clearPreferanceErrorState($languagesEl);
             } else {
                 $languagesEl.addClass('error');
                 HtmlUtils.setHtml(
@@ -171,7 +173,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             HtmlUtils.setHtml(
                 $providerEl,
                 HtmlUtils.interpolateHtml(
-                    HtmlUtils.HTML('<input type="radio" name="transcript-provider" value="" {checked}/>{text}'),
+                    HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),
                     {
                         text: gettext('None'),
                         checked: self.selectedProvider === '' ? 'checked' : ''
@@ -184,7 +186,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 HtmlUtils.append(
                     $providerEl,
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<input type="radio" name="transcript-provider" value="{value}" {checked}/>{text}'),
+                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),
                         {
                             text: providerObject.display_name,
                             value: key,
@@ -198,7 +200,11 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         populateTurnaround: function() {
             var self = this,
                 turnaroundPlan = self.getTurnaroundPlan(),
+                $turnaroundContainer = self.$el.find('.transcript-turnaround-wrapper'),
                 $turnaround = self.$el.find('#transcript-turnaround');
+
+            // Clear error state if present any.
+            this.clearPreferanceErrorState($turnaroundContainer);
 
             if(self.selectedProvider && turnaroundPlan) {
                 $turnaround.empty().append(new Option(gettext('Select turnaround'), ''));
@@ -209,16 +215,20 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     }
                     $turnaround.append(option);
                 });
-                self.$el.find('.transcript-turnaround-wrapper').show();
+                $turnaroundContainer.show();
             } else {
-                self.$el.find('.transcript-turnaround-wrapper').hide();
+                $turnaroundContainer.hide();
             }
         },
 
         populateFidelity: function() {
             var self = this,
                 fidelityPlan = self.getFidelityPlan(),
+                $fidelityContainer = self.$el.find('.transcript-fidelity-wrapper'),
                 $fidelity = self.$el.find('#transcript-fidelity');
+
+            // Clear error state if present any.
+            this.clearPreferanceErrorState($fidelityContainer);
 
             // Fidelity dropdown
             if (self.selectedProvider &&fidelityPlan) {
@@ -238,9 +248,13 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
         populateLanguages: function() {
             var self = this,
+                $languagesPreferanceContainer = self.$el.find('.transcript-languages-wrapper'),
                 $languagesContainer = self.$el.find('.languages-menu-container'),
                 isTurnaroundSelected = self.$el.find('#transcript-turnaround')[0].options.selectedIndex,
                 isFidelitySelected = self.$el.find('#transcript-fidelity')[0].options.selectedIndex;
+
+            // Clear error state if present any.
+            this.clearPreferanceErrorState($languagesPreferanceContainer);
 
             $languagesContainer.empty();
 
@@ -331,6 +345,12 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             });
         },
 
+        clearPreferanceErrorState: function($preferanceContainer) {
+            $preferanceContainer.removeClass('error');
+            $preferanceContainer.find('.error-icon').empty();
+            $preferanceContainer.find('.error-info').empty();
+        },
+
         validateCourseVideoSettings: function() {
             var isValid = true,
                 $providerEl = this.$el.find('.transcript-provider-wrapper'),
@@ -357,9 +377,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     requiredText
                 );
             } else {
-                $turnaroundEl.removeClass('error');
-                $turnaroundEl.find('.error-icon').empty();
-                $turnaroundEl.find('.error-info').empty();
+                this.clearPreferanceErrorState($turnaroundEl);
             }
 
 
@@ -375,9 +393,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     requiredText
                 );
             } else {
-                $fidelityEl.removeClass('error');
-                $fidelityEl.find('.error-icon').empty();
-                $fidelityEl.find('.error-info').empty();
+                this.clearPreferanceErrorState($fidelityEl);
             }
 
 
@@ -393,9 +409,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     requiredText
                 );
             } else {
-                $languagesEl.removeClass('error');
-                $languagesEl.find('.error-icon').empty();
-                $languagesEl.find('.error-info').empty();
+                this.clearPreferanceErrorState($languagesEl);
+
             }
 
             return isValid;

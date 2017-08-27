@@ -81,7 +81,7 @@
         color: $color-error;
       }
 
-      .error-info, .fa-info-circle {
+      .error-info, .error-icon .fa-info-circle {
         color: $color-error;
       }
 
@@ -90,7 +90,6 @@
       }
 
       label {
-        display: block;
         font-size: 1em;
         margin-bottom: 5px;
       }
