@@ -31,26 +31,17 @@ define(
 
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
-                setFixtures('<div class="video-transcript-settings-wrapper"></div>');
                 setFixtures(
                     '<div id="page-prompt"></div><div id="page-notification"></div><div id="reader-feedback"></div>'
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
-                TemplateHelpers.installTemplate('course-video-settings');
                 this.postUrl = POST_URL;
-                this.courseVideoSettingsButton = $('<button>');
                 this.videoSupportedFileFormats = ['.mp4', '.mov'];
                 this.videoUploadMaxFileSizeInGB = 5;
                 this.view = new ActiveVideoUploadListView({
                     concurrentUploadLimit: concurrentUploadLimit,
                     postUrl: this.postUrl,
-                    courseVideoSettingsButton: this.courseVideoSettingsButton,
-                    activeTranscriptPreferences: {},
-                    videoTranscriptSettings: {
-                        transcription_plans: {},
-                        transcript_preferences_handler_url: ''
-                    },
                     videoSupportedFileFormats: this.videoSupportedFileFormats,
                     videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB
                 });
@@ -85,13 +76,6 @@ define(
                 this.view.$('.file-drop-area').click();
                 expect(clickSpy).toHaveBeenCalled();
                 clickSpy.calls.reset();
-            });
-
-            it('should trigger course video settings when course video settings button is clicked', function() {
-                var clickSpy = jasmine.createSpy();
-                clickSpy.and.callFake(function(event) { event.preventDefault(); });
-                this.courseVideoSettingsButton.click();
-                expect(clickSpy).toHaveBeenCalled();
             });
 
             it('should not show a notification message if there are no active video uploads', function() {

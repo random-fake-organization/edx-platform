@@ -128,8 +128,7 @@ define(
             };
 
             beforeEach(function() {
-                setFixtures('<div class="video-transcript-settings-wrapper"></div>');
-                //setFixtures('<button class="button course-video-settings-button">');
+                setFixtures('<div class="video-transcript-settings-wrapper"></div><button class="button course-video-settings-button">');
                 TemplateHelpers.installTemplate('course-video-settings');
                 renderCourseVideoSettingsView();
             });
