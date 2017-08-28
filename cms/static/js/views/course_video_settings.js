@@ -34,13 +34,17 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.listenTo(Backbone, 'coursevideosettings:showCourseVideoSettingsView', this.render);
         },
 
-        registerClickHandler: function() {
+        registerCloseClickHandler: function() {
             var self = this;
+
+            // Preventing any parent handlers from being notified of the event. This is to stop from firing the document
+            // level click handler to execute on course video settings pane click.
             self.$el.click(function(event){
                 event.stopPropagation();
             });
 
-            $(document).click(function(){
+            // Click anywhere outside the course video settings pane would close the pane.
+            $(document).click(function(event){
                 // if the target of the click isn't the container nor a descendant of the contain
                 if (!self.$el.is(event.target) && self.$el.has(event.target).length === 0) {
                     self.closeCourseVideoSettings();
@@ -474,7 +478,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             this.populatePreferences();
 
-            this.registerClickHandler();
+            this.registerCloseClickHandler();
             this.setFixedCourseVideoSettingsPane();
             return this;
         },
@@ -519,6 +523,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Unbind any events associated
             this.undelegateEvents();
+
+            // Remove click handler on document
+            // $(document).off('click', this.closeClickHandler);
 
             // Empty this.$el content from DOM
             this.$el.empty();

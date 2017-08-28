@@ -133,6 +133,11 @@ define(
                 renderCourseVideoSettingsView();
             });
 
+            afterEach(function() {
+                courseVideoSettingsView.closeCourseVideoSettings();
+                courseVideoSettingsView = null;
+            });
+
             it('renders as expected', function() {
                 expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
             });
