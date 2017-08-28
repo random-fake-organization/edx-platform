@@ -99,12 +99,19 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         fidelitySelected: function(event) {
+            var $fidelityContainer = this.$el.find('.transcript-fidelity-wrapper');
             this.selectedFidelityPlan = event.target.value;
+            // Remove any error if present already.
+            this.clearPreferanceErrorState($fidelityContainer);
             this.populateLanguages();
         },
 
         turnaroundSelected: function(event) {
+            var $turnaroundContainer = this.$el.find('.transcript-turnaround-wrapper');
+
             this.selectedTurnaroundPlan = event.target.value;
+            // Remove any error if present already.
+            this.clearPreferanceErrorState($turnaroundContainer);
             this.populateLanguages();
         },
 
@@ -117,9 +124,10 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         languageAdded: function(event) {
             var $parentEl = $(event.target.parentElement).parent(),
                 $languagesEl = this.$el.find('.transcript-languages-wrapper'),
-                selectedLanguage = $parentEl.find('select').val(),
-                requiredText = gettext('Required'),
-                infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
+                selectedLanguage = $parentEl.find('select').val();
+
+            // Remove any error if present already.
+            this.clearPreferanceErrorState($languagesEl);
 
             // Only add if not in the list already.
             if (selectedLanguage && _.indexOf(this.selectedLanguages, selectedLanguage) === -1) {
@@ -146,19 +154,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
                 // Add a new language menu
                 this.addLanguageMenu();
-
-                // Remove any error if present already.
-                this.clearPreferanceErrorState($languagesEl);
             } else {
-                $languagesEl.addClass('error');
-                HtmlUtils.setHtml(
-                    $languagesEl.find('.error-icon'),
-                    infoIconHtml
-                );
-                HtmlUtils.setHtml(
-                    $languagesEl.find('.error-info'),
-                    requiredText
-                );
+                this.addErrorState($languagesEl);
             }
         },
 
@@ -172,7 +169,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             var self = this,
                 providerPlan = self.getProviderPlan(),
                 $providerEl = self.$el.find('.transcript-provider-group');
-            // Provider dropdown
+
             $providerEl.empty();
             HtmlUtils.setHtml(
                 $providerEl,
@@ -364,14 +361,28 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.clearResponseStatus();
         },
 
+        addErrorState: function($preferanceContainer) {
+            var requiredText = gettext('Required'),
+                infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
+
+            $preferanceContainer.addClass('error');
+            HtmlUtils.setHtml(
+                $preferanceContainer.find('.error-icon'),
+                infoIconHtml
+            );
+            HtmlUtils.setHtml(
+                $preferanceContainer.find('.error-info'),
+                requiredText
+            );
+        },
+
         validateCourseVideoSettings: function() {
             var isValid = true,
                 $providerEl = this.$el.find('.transcript-provider-wrapper'),
                 $turnaroundEl = this.$el.find('.transcript-turnaround-wrapper'),
                 $fidelityEl = this.$el.find('.transcript-fidelity-wrapper'),
-                $languagesEl = this.$el.find('.transcript-languages-wrapper'),
-                requiredText = gettext('Required'),
-                infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
+                $languagesEl = this.$el.find('.transcript-languages-wrapper');
+
 
             // Explicit None selected case.
             if(this.selectedProvider === '') {
@@ -380,15 +391,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             if (!this.selectedTurnaroundPlan){
                 isValid = false;
-                $turnaroundEl.addClass('error');
-                HtmlUtils.setHtml(
-                    $turnaroundEl.find('.error-icon'),
-                    infoIconHtml
-                );
-                HtmlUtils.setHtml(
-                    $turnaroundEl.find('.error-info'),
-                    requiredText
-                );
+                this.addErrorState($turnaroundEl);
             } else {
                 this.clearPreferanceErrorState($turnaroundEl);
             }
@@ -396,15 +399,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             if (this.selectedProvider === 'Cielo24' && !this.selectedFidelityPlan) {
                 isValid = false;
-                $fidelityEl.addClass('error');
-                HtmlUtils.setHtml(
-                    $fidelityEl.find('.error-icon'),
-                    infoIconHtml
-                );
-                HtmlUtils.setHtml(
-                    $fidelityEl.find('.error-info'),
-                    requiredText
-                );
+                this.addErrorState($fidelityEl);
             } else {
                 this.clearPreferanceErrorState($fidelityEl);
             }
@@ -412,18 +407,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             if (this.selectedLanguages.length === 0) {
                 isValid = false;
-                $languagesEl.addClass('error');
-                HtmlUtils.setHtml(
-                    $languagesEl.find('.error-icon'),
-                    infoIconHtml
-                );
-                HtmlUtils.setHtml(
-                    $languagesEl.find('.error-info'),
-                    requiredText
-                );
+                this.addErrorState($languagesEl);
             } else {
                 this.clearPreferanceErrorState($languagesEl);
-
             }
 
             return isValid;
