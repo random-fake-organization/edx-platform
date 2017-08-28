@@ -489,7 +489,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         render: function() {
-            var dateModified = '';//this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
+            var dateModified = this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
             HtmlUtils.setHtml(
                 this.$el,
                 this.template({
