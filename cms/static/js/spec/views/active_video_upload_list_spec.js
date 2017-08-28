@@ -31,11 +31,13 @@ define(
 
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
+                setFixtures('<div class="video-transcript-settings-wrapper"></div>');
                 setFixtures(
                     '<div id="page-prompt"></div><div id="page-notification"></div><div id="reader-feedback"></div>'
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
+                TemplateHelpers.installTemplate('course-video-settings');
                 this.postUrl = POST_URL;
                 this.courseVideoSettingsButton = $('<button>');
                 this.videoSupportedFileFormats = ['.mp4', '.mov'];
@@ -44,6 +46,11 @@ define(
                     concurrentUploadLimit: concurrentUploadLimit,
                     postUrl: this.postUrl,
                     courseVideoSettingsButton: this.courseVideoSettingsButton,
+                    activeTranscriptPreferences: {},
+                    videoTranscriptSettings: {
+                        transcription_plans: {},
+                        transcript_preferences_handler_url: ''
+                    },
                     videoSupportedFileFormats: this.videoSupportedFileFormats,
                     videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB
                 });
