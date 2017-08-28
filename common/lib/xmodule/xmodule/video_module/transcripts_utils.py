@@ -11,6 +11,8 @@ from pysrt import SubRipTime, SubRipItem, SubRipFile
 from lxml import etree
 from HTMLParser import HTMLParser
 
+from edxval import api as edxval_api
+
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -466,6 +468,42 @@ def get_or_create_sjson(item, transcripts):
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
     sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript
+
+
+def get_video_transcript_data(video, lang_code=None):
+    """
+    Gets video transcript(s) from edx-val for either an edx_video_id or any of the external sources.
+
+    Arguments:
+        video(VideoDescriptor): A video XModule descriptor.
+        lang_code(str): Language code
+    """
+    # video id which is yet to be calculated.
+    kwargs = {'video_id': None}
+
+    # make decision about the transcript data method
+    if lang_code:
+        kwargs['language_code'] = lang_code
+        get_transcript_data_func = edxval_api.get_video_transcript
+    else:
+        get_transcript_data_func = edxval_api.get_video_transcripts
+
+    video_transcript_data = None
+    if video.edx_video_id:
+        # Check transcripts for an `edx_video_id`
+        kwargs['video_id'] = video.edx_video_id
+        video_transcript_data = get_transcript_data_func(**kwargs)
+        # TODO: Make decision about actual external sources if we don't get transcript for edx_video_id.
+    else:
+        # Check if transcripts are there for any of the external source.
+        external_video_ids = [video.youtube_id_1_0] + get_html5_ids(video.html5_sources)
+        for video_id in external_video_ids:
+            kwargs['video_id'] = video_id
+            video_transcript_data = get_transcript_data_func(**kwargs)
+            if video_transcript_data:
+                break
+
+    return video_transcript_data
 
 
 class Transcript(object):

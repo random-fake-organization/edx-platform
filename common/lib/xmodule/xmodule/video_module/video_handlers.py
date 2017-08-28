@@ -7,6 +7,7 @@ StudioViewHandlers are handlers for video descriptor instance.
 
 import json
 import logging
+
 from datetime import datetime
 from webob import Response
 
@@ -15,6 +16,9 @@ from xblock.core import XBlock
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.video_module.transcripts_utils import get_html5_ids
+from xmodule.video_module.transcripts_utils import get_video_transcript_data
 
 from .transcripts_utils import (
     get_or_create_sjson,
@@ -26,6 +30,11 @@ from .transcripts_utils import (
     save_to_store,
     subs_filename
 )
+
+try:
+    from edxval import api as edxval_api
+except ImportError:
+    edxval_api = None
 
 
 log = logging.getLogger(__name__)
@@ -242,7 +251,25 @@ class VideoStudentViewHandlers(object):
                 log.debug(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
-                return self.get_static_transcript(request, transcripts)
+                response = self.get_static_transcript(request, transcripts)
+                if response.status_code == 404:
+                    # TODO: Check for a course-specific role out feature flag first.
+                    video_transcript = get_video_transcript_data(self, lang_code=language)
+                    if video_transcript:
+                        # Read the transcript content
+                        video_transcript.transcript.file.open(mode='rb')
+                        transcript_sjson_content = video_transcript.transcript.file.read()
+                        video_transcript.transcript.file.close()
+
+                        if transcript_sjson_content:
+                            response = Response(
+                                transcript_sjson_content,
+                                headerlist=[('Content-Language', language)],
+                                content_type=Transcript.mime_types['sjson'],
+                                charset='utf8',
+                            )
+
+                return response
             except (
                 TranscriptException,
                 UnicodeDecodeError,
@@ -260,8 +287,44 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
                     transcripts, transcript_format=self.transcript_download_format, lang=lang
                 )
-            except (NotFoundError, ValueError, KeyError, UnicodeDecodeError):
-                log.debug("Video@download exception")
+            except NotFoundError:
+                # TODO: Check for a course-specific role out feature flag first.
+                response = Response(status=404)
+
+                # Make sure the language is set.
+                if lang is None:
+                    lang = self.get_default_transcript_language(transcripts)
+
+                video_transcript = get_video_transcript_data(self, lang_code=lang)
+                if video_transcript:
+                    # Read the transcript content
+                    video_transcript.transcript.file.open(mode='rb')
+                    transcript_sjson_content = video_transcript.transcript.file.read()
+                    video_transcript.transcript.file.close()
+
+                    if transcript_sjson_content:
+                        transcript_content = Transcript.convert(
+                            transcript_sjson_content,
+                            input_format='sjson',
+                            output_format=self.transcript_download_format
+                        )
+
+                        # Construct a filename
+                        filename = '{filename}.{ext}'.format(
+                            filename=video_transcript.transcript.name.split('.')[0].encode('utf8'),
+                            ext=self.transcript_download_format
+                        )
+                        response = Response(
+                            transcript_content,
+                            headerlist=[
+                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
+                                ('Content-Language', self.transcript_language),
+                            ],
+                            charset='utf8',
+                        )
+
+                return response
+            except (ValueError, KeyError, UnicodeDecodeError):
                 return Response(status=404)
             else:
                 response = Response(

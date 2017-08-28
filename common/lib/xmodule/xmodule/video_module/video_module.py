@@ -177,7 +177,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if self.download_track:
             if self.track:
                 track_url = self.track
-            elif sub or other_lang:
+            else:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
         transcript_language = self.get_default_transcript_language(transcripts)
