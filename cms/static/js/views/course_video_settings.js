@@ -349,10 +349,19 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             });
         },
 
+        clearResponseStatus: function() {
+            // Remove parent level state.
+            this.$el.find('.course-video-settings-error-wrapper').empty();
+            this.$el.find('.course-video-settings-success-wrapper').empty();
+        },
+
         clearPreferanceErrorState: function($preferanceContainer) {
             $preferanceContainer.removeClass('error');
             $preferanceContainer.find('.error-icon').empty();
             $preferanceContainer.find('.error-info').empty();
+
+            // Also clear response status if present already
+            this.clearResponseStatus();
         },
 
         validateCourseVideoSettings: function() {
@@ -424,12 +433,17 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             var self = this,
                 $successEl = self.$el.find('.course-video-settings-success-wrapper'),
                 $errorEl = self.$el.find('.course-video-settings-error-wrapper');
+
+            // First clear response status if present already
+            this.clearResponseStatus();
+
             $.postJSON(this.transcriptHandlerUrl, {
                 provider: self.selectedProvider,
                 cielo24_fidelity: self.selectedFidelityPlan,
                 cielo24_turnaround: self.selectedProvider === 'Cielo24' ? self.selectedTurnaroundPlan : '',
                 three_play_turnaround: self.selectedProvider === '3PlayMedia' ? self.selectedTurnaroundPlan : '',
-                preferred_languages: self.selectedLanguages
+                preferred_languages: self.selectedLanguages,
+                global: false   // Do not trigger global AJAX error handler
             }, function(data) {
                 if (data.transcript_preferences) {
                     HtmlUtils.setHtml(
@@ -444,18 +458,25 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     self.activeTranscriptionPlan = data.transcript_preferences;
                     // Sync ActiveUploadListView with latest active plan.
                     Backbone.trigger('coursevideosettings:syncActiveTranscriptPreferences', self.activeTranscriptionPlan);
-                } else {
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                var errorMessage;
+                if (jqXHR.responseText) {
+                    // Enclose inside try-catch so that if we get erroneous data, we could still show some error to user
+                    try {
+                        errorMessage = $.parseJSON(jqXHR.responseText).error;
+                    } catch (e) {}
                     HtmlUtils.setHtml(
                         $errorEl,
                         HtmlUtils.interpolateHtml(
                             HtmlUtils.HTML('<div class="course-video-settings-error"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span>{text}</span></div>'),
                             {
-                                text: gettext('Error saving data.')
+                                text: errorMessage || gettext('Error saving data.')
                             }
                         )
                     );
                 }
-            })
+            });
         },
 
         updateCourseVideoSettings: function(event) {
@@ -468,7 +489,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         render: function() {
-            var dateModified = this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
+            var dateModified = '';//this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
             HtmlUtils.setHtml(
                 this.$el,
                 this.template({
@@ -502,7 +523,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             $(window).scroll(function(){
 
                 // Remove transition when we start scrolling.
-                // Why we do this? The settings pane does some back and forth movemment when it is switched between
+                // Why we do this? The settings pane does some back and forth movement when it is switched between
                 // position:fixed and position:absolute, it's right and top position are then being changed wrt to their
                 // position layout.
                 $courseVideoSettingsContainer.css('transition', 'none');
@@ -523,9 +544,6 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Unbind any events associated
             this.undelegateEvents();
-
-            // Remove click handler on document
-            // $(document).off('click', this.closeClickHandler);
 
             // Empty this.$el content from DOM
             this.$el.empty();
