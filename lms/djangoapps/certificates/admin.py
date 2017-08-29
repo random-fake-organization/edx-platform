@@ -7,7 +7,6 @@ from django.contrib import admin
 
 from certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
@@ -60,17 +59,7 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
     list_display = ('id', 'course_id', 'mode', 'user')
 
 
-class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
-    """
-    Django admin customizations for CertificateGenerationCourseSetting model
-    """
-    list_display = ('course_key', 'enabled')
-    search_fields = ('course_key',)
-    show_full_result_count = False
-
-
 admin.site.register(CertificateGenerationConfiguration)
-admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)

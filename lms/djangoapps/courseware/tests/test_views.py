@@ -1347,9 +1347,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
-        # Enable certificate generation for this course
-        certs_api.set_cert_generation_enabled(self.course.id, True)
-
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
@@ -1373,9 +1370,6 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
-
-        # Enable certificate generation for this course
-        certs_api.set_cert_generation_enabled(self.course.id, True)
 
         # Course certificate configurations
         certificates = [
@@ -1433,9 +1427,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
 
-        # Enable certificate generation for this course
-        certs_api.set_cert_generation_enabled(self.course.id, True)
-
         resp = self._get_progress_page()
         self.assertContains(resp, u"Download Your Certificate")
 
@@ -1491,7 +1482,6 @@ class ProgressPageTests(ProgressPageBaseTests):
     def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
         CertificateGenerationConfiguration(enabled=True).save()
-        certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
         with patch(
             'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
@@ -1680,7 +1670,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             mode=mode
         )
         CertificateGenerationConfiguration(enabled=True).save()
-        certs_api.set_cert_generation_enabled(self.course.id, True)
         return generated_certificate
 
     def mock_certificate_downloadable_status(
