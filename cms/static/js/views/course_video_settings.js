@@ -170,32 +170,34 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 providerPlan = self.getProviderPlan(),
                 $providerEl = self.$el.find('.transcript-provider-group');
 
-            $providerEl.empty();
-            HtmlUtils.setHtml(
-                $providerEl,
-                HtmlUtils.interpolateHtml(
-                    HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),
-                    {
-                        text: gettext('None'),
-                        checked: self.selectedProvider === '' ? 'checked' : ''
-                    }
-                )
-            );
-
-            _.each(providerPlan, function(providerObject, key){
-                var checked = self.selectedProvider === key ? 'checked' : '';
-                HtmlUtils.append(
+            if (providerPlan) {
+                $providerEl.empty();
+                HtmlUtils.setHtml(
                     $providerEl,
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),
+                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),
                         {
-                            text: providerObject.display_name,
-                            value: key,
-                            checked: checked
+                            text: gettext('None'),
+                            checked: self.selectedProvider === '' ? 'checked' : ''
                         }
                     )
-                )
-            });
+                );
+
+                _.each(providerPlan, function (providerObject, key) {
+                    var checked = self.selectedProvider === key ? 'checked' : '';
+                    HtmlUtils.append(
+                        $providerEl,
+                        HtmlUtils.interpolateHtml(
+                            HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),
+                            {
+                                text: providerObject.display_name,
+                                value: key,
+                                checked: checked
+                            }
+                        )
+                    )
+                });
+            }
         },
 
         populateTurnaround: function() {
