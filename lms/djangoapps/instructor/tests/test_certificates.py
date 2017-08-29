@@ -234,9 +234,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         cache.clear()
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
-    @ddt.data('generate_example_certificates', 'enable_certificate_generation')
-    def test_allow_only_global_staff(self, url_name):
-        url = reverse(url_name, kwargs={'course_id': self.course.id})
+    def test_allow_only_global_staff(self):
+        url = reverse('generate_example_certificates', kwargs={'course_id': self.course.id})
 
         # Instructors do not have access
         self.client.login(username=self.instructor.username, password='test')
@@ -264,23 +263,6 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # but the status should at least not be None.
         status = certs_api.example_certificates_status(self.course.id)
         self.assertIsNot(status, None)
-
-    @ddt.data(True, False)
-    def test_enable_certificate_generation(self, is_enabled):
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'enable_certificate_generation',
-            kwargs={'course_id': unicode(self.course.id)}
-        )
-        params = {'certificates-enabled': 'true' if is_enabled else 'false'}
-        response = self.client.post(url, data=params)
-
-        # Expect a redirect back to the instructor dashboard
-        self._assert_redirects_to_instructor_dash(response)
-
-        # Expect that certificate generation is now enabled for the course
-        actual_enabled = certs_api.cert_generation_enabled(self.course.id)
-        self.assertEqual(is_enabled, actual_enabled)
 
     def _assert_redirects_to_instructor_dash(self, response):
         """Check that the response redirects to the certificates section. """

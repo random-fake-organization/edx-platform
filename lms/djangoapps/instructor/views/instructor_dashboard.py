@@ -374,10 +374,6 @@ def _section_certificates(course):
                 'generate_example_certificates',
                 kwargs={'course_id': course.id}
             ),
-            'enable_certificate_generation': reverse(
-                'enable_certificate_generation',
-                kwargs={'course_id': course.id}
-            ),
             'start_certificate_generation': reverse(
                 'start_certificate_generation',
                 kwargs={'course_id': course.id}
