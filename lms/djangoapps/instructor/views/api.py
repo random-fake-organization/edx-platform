@@ -2834,6 +2834,25 @@ def generate_example_certificates(request, course_id=None):  # pylint: disable=u
     certs_api.generate_example_certificates(course_key)
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
+
+@require_global_staff
+@require_POST
+def enable_certificate_generation(request, course_id=None):
+    """Enable/disable self-generated certificates for a course.
+
+    Once self-generated certificates have been enabled, students
+    who have passed the course will be able to generate certificates.
+
+    Redirects back to the intructor dashboard once the
+    setting has been updated.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
+    certs_api.set_cert_generation_enabled(course_key, is_enabled)
+    return redirect(_instructor_dash_url(course_key, section='certificates'))
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
