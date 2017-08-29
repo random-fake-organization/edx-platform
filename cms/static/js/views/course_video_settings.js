@@ -530,10 +530,12 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Unbind any events associated
             this.undelegateEvents();
+            this.stopListening();
 
             // Empty this.$el content from DOM
             this.$el.empty();
 
+            // Reset everything.
             this.resetPlanData();
         }
     });

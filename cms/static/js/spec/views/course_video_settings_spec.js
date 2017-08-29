@@ -128,7 +128,10 @@ define(
             };
 
             beforeEach(function() {
-                setFixtures('<div class="video-transcript-settings-wrapper"></div><button class="button course-video-settings-button">');
+                setFixtures(
+                    '<div class="video-transcript-settings-wrapper"></div>' +
+                    '<button class="button course-video-settings-button"></button>'
+                );
                 TemplateHelpers.installTemplate('course-video-settings');
                 renderCourseVideoSettingsView();
             });
@@ -139,6 +142,24 @@ define(
             });
 
             it('renders as expected', function() {
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
+            });
+
+            it('closes course video settings pane when close button is clicked', function() {
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
+                $courseVideoSettingsEl.find('.action-close-course-video-settings').click();
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).not.toExist();
+            });
+
+            it('closes course video settings pane when clicked outside course video settings pane', function() {
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
+                $('body').click();
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).not.toExist();
+            });
+
+            it('does not close course video settings pane when clicked inside the course video settings pane', function() {
+                expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
+                $courseVideoSettingsEl.find('.transcript-provider-group').click();
                 expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
             });
         });
