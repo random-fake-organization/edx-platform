@@ -340,7 +340,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             );
             $transcriptLanguage = this.$el.find('#transcript-language-menu-' + totalCurrentLanguageMenus);
 
-            $transcriptLanguage.append(new Option(gettext('Choose a language'), ''));
+            $transcriptLanguage.append(new Option(gettext('Select language'), ''));
             _.each(availableLanguages, function(value, key){
                 $transcriptLanguage.append(new Option(value, key));
             });
