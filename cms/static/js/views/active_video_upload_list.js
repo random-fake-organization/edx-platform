@@ -221,8 +221,7 @@ define([
                                 url: view.postUrl,
                                 contentType: 'application/json',
                                 data: JSON.stringify({
-                                    files: [{file_name: file.name, content_type: file.type}],
-                                    transcript_preferences: view.activeTranscriptPreferences
+                                    files: [{file_name: file.name, content_type: file.type}]
                                 }),
                                 dataType: 'json',
                                 type: 'POST',
