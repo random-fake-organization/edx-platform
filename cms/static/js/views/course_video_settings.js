@@ -177,7 +177,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),
                         {
-                            text: gettext('None'),
+                            text: gettext('N/A'),
                             checked: self.selectedProvider === '' ? 'checked' : ''
                         }
                     )

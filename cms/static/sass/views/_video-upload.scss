@@ -13,12 +13,6 @@
     }
   }
 
-  .video-uploads-header, .course-video-settings-title {
-    font-size: 1.5em;
-    margin-bottom: .25em;
-    font-weight: 600
-  }
-
   .fixed-container {
     position: fixed !important;
     top: 0 !important;
@@ -28,10 +22,13 @@
     position: absolute;
     top: 0;
     right: -100%;
-    background-color: #f9f9f9;
     z-index: 1000;
-    width: 350px;
+    width: 352px;
     transition: all 0.3s ease;
+    background-color: #ffffff;
+    -webkit-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+    -moz-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+    box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
 
     .button-link {
       background:none;
@@ -42,29 +39,43 @@
     }
 
     .action-close-wrapper {
-      background-color: $gray-l3;
       .action-close-course-video-settings {
         width: 100%;
-        padding: 10px 20px;
+        padding: 10px 16px;
         text-align: left;
-        background-color: transparent;
+        background-color: #ECF0F1;
         border: transparent;
+        height: 48px;
+        font-size: 16px;
+        color: #2C3E50;
       }
     }
 
     .course-video-settings-wrapper {
-      padding: 20px 20px;
+      margin-top: 32px;
+      padding: 20px 16px;
+
+      .course-video-settings-title {
+        font-size: 24px;
+        color: #333333;
+        margin: 32px 0 16px 0;
+        font-weight: font-weight(semi-bold);
+      }
 
       .course-video-settings-success, .course-video-settings-error {
         padding: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
+        height: 48px;
+        color: #000000;
+        font-size: 16px;
+        border: solid 1px #d6e9c6;
         .icon {
           margin-right: 5px;
         }
       }
 
       .course-video-settings-success {
-        background-color: $color-ready;
+        background-color: #dff0d8;
       }
 
       .course-video-settings-error {
@@ -72,7 +83,7 @@
       }
 
       .transcript-preferance-wrapper {
-        margin-top: 20px;
+        margin-top: 32px;
         .icon.fa-info-circle {
           margin-left: 5px;
         }
@@ -90,12 +101,23 @@
       }
 
       label {
-        font-size: 1em;
-        margin-bottom: 5px;
+        color: #333333;
+        font-size: 15px;
+        font-weight: font-weight(semi-bold);
       }
 
-      .transcript-provider-group input[type=radio] {
-        margin: 0 10px;
+      .transcript-provider-group, .transcript-languages-container, .transcript-turnaround, .transcript-fidelity  {
+        margin-top: 16px;
+      }
+
+
+      .transcript-provider-group {
+        input[type=radio]  {
+          margin: 0 10px;
+        }
+        label {
+          font-weight: normal;
+        }
       }
 
       .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .transcript-languages-wrapper {
@@ -105,10 +127,9 @@
       .transcript-languages-container .languages-menu-container {
         overflow: scroll;
         max-height: 200px;
-        margin: 15px 0;
         padding: 0 20px;
         .transcript-language-menu-container {
-          margin-top: 10px;
+          margin-top: 16px;
           .transcript-language-menu {
             width: 65%;
           }
