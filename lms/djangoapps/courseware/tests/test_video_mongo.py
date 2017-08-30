@@ -1120,7 +1120,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
             context = self.item_descriptor.get_context()
             self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
-
     @ddt.data(
         (
             {
