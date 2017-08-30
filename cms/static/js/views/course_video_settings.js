@@ -380,7 +380,6 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
         validateCourseVideoSettings: function() {
             var isValid = true,
-                $providerEl = this.$el.find('.transcript-provider-wrapper'),
                 $turnaroundEl = this.$el.find('.transcript-turnaround-wrapper'),
                 $fidelityEl = this.$el.find('.transcript-fidelity-wrapper'),
                 $languagesEl = this.$el.find('.transcript-languages-wrapper');
@@ -439,7 +438,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                         HtmlUtils.interpolateHtml(
                             HtmlUtils.HTML('<div class="course-video-settings-success"><span class="icon fa fa-check-circle" aria-hidden="true"></span><span>{text}</span></div>'),
                             {
-                                text: gettext('Settings updated.')
+                                text: gettext('Settings updated')
                             }
                         )
                     );
@@ -459,7 +458,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                         HtmlUtils.interpolateHtml(
                             HtmlUtils.HTML('<div class="course-video-settings-error"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span>{text}</span></div>'),
                             {
-                                text: errorMessage || gettext('Error saving data.')
+                                text: errorMessage || gettext('Error saving data')
                             }
                         )
                     );

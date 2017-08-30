@@ -8,7 +8,8 @@ define(
                 courseVideoSettingsView,
                 renderCourseVideoSettingsView,
                 destroyCourseVideoSettingsView,
-                transcript_preferences_handler_url = '/transcript_preferences/course-v1:edX+DemoX+Demo_Course',
+                verifyPreferanceErrorState,
+                transcriptPreferencesUrl = '/transcript_preferences/course-v1:edX+DemoX+Demo_Course',
                 activeTranscriptPreferences = {
                     'provider': 'Cielo24',
                     'cielo24_fidelity': 'PROFESSIONAL',
@@ -22,7 +23,7 @@ define(
                     ],
                     'modified': '2017-08-27T12:28:17.421260Z'
                 },
-                transcription_plans = {
+                transcriptionPlans = {
                     '3PlayMedia': {
                         'languages': {
                             'fr': 'French',
@@ -117,12 +118,12 @@ define(
                     }
                 };
 
-            renderCourseVideoSettingsView = function(activeTranscriptPreferences, transcription_plans) {
+            renderCourseVideoSettingsView = function(activeTranscriptPreferences, transcriptionPlans) {
                 courseVideoSettingsView  = new CourseVideoSettingsView({
                     activeTranscriptPreferences: activeTranscriptPreferences || null,
                     videoTranscriptSettings: {
-                        transcript_preferences_handler_url: transcript_preferences_handler_url,
-                        transcription_plans: transcription_plans || null
+                        transcript_preferences_handler_url: transcriptPreferencesUrl,
+                        transcription_plans: transcriptionPlans || null
                     }
                 });
                 $courseVideoSettingsEl = courseVideoSettingsView.render().$el;
@@ -135,13 +136,21 @@ define(
                 }
             };
 
+            verifyPreferanceErrorState = function($preferanceContainerEl, hasError) {
+                var $errorIconHtml = hasError ? '<span class="icon fa fa-info-circle" aria-hidden="true"></span>': '',
+                    requiredText = hasError ? 'Required' : '';
+                expect($preferanceContainerEl.hasClass('error')).toEqual(hasError);
+                expect($preferanceContainerEl.find('.error-icon').html()).toEqual($errorIconHtml);
+                expect($preferanceContainerEl.find('.error-info').html()).toEqual(requiredText);
+            };
+
             beforeEach(function() {
                 setFixtures(
                     '<div class="video-transcript-settings-wrapper"></div>' +
                     '<button class="button course-video-settings-button"></button>'
                 );
                 TemplateHelpers.installTemplate('course-video-settings');
-                renderCourseVideoSettingsView(activeTranscriptPreferences, transcription_plans);
+                renderCourseVideoSettingsView(activeTranscriptPreferences, transcriptionPlans);
             });
 
             afterEach(function() {
@@ -209,6 +218,92 @@ define(
                 expect(courseVideoSettingsView.selectedTurnaroundPlan, activeTranscriptPreferences.cielo24_turnaround);
                 expect(courseVideoSettingsView.selectedFidelityPlan, activeTranscriptPreferences.cielo24_fidelity);
                 expect(courseVideoSettingsView.selectedLanguages, activeTranscriptPreferences.preferred_languages);
+            });
+
+            it('saves transcript settings on update settings buttton click if preferances are selected', function() {
+                var requests = AjaxHelpers.requests(this);
+                $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    transcriptPreferencesUrl,
+                    JSON.stringify({
+                        provider: activeTranscriptPreferences.provider,
+                        cielo24_fidelity: activeTranscriptPreferences.cielo24_fidelity,
+                        cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
+                        three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
+                        preferred_languages: activeTranscriptPreferences.preferred_languages,
+                        global: false,
+                    })
+                );
+
+                // Send successful upload response
+                AjaxHelpers.respondWithJson(requests, {
+                    transcript_preferences: activeTranscriptPreferences
+                });
+
+                // Verify that success message is shown.
+                expect($courseVideoSettingsEl.find('.course-video-settings-success').html()).toEqual(
+                    '<span class="icon fa fa-check-circle" aria-hidden="true"></span><span>Settings updated</span>'
+                );
+            });
+
+            it('shows error message if server sends error', function() {
+                var requests = AjaxHelpers.requests(this);
+                $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    transcriptPreferencesUrl,
+                    JSON.stringify({
+                        provider: activeTranscriptPreferences.provider,
+                        cielo24_fidelity: activeTranscriptPreferences.cielo24_fidelity,
+                        cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
+                        three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
+                        preferred_languages: activeTranscriptPreferences.preferred_languages,
+                        global: false,
+                    })
+                );
+
+                // Send error response.
+                AjaxHelpers.respondWithError(requests, 400, {
+                    error: 'Error message'
+                });
+
+                // Verify that success message is shown.
+                expect($courseVideoSettingsEl.find('.course-video-settings-error').html()).toEqual(
+                    '<span class="icon fa fa-info-circle" aria-hidden="true"></span><span>Error message</span>'
+                );
+            });
+
+            it('implies preferences are required if not selected when saving preferances', function() {
+                var requests = AjaxHelpers.requests(this);
+
+                // Reset so that no preferance is selected.
+                courseVideoSettingsView.selectedTurnaroundPlan = '';
+                courseVideoSettingsView.selectedFidelityPlan = '';
+                courseVideoSettingsView.selectedLanguages = [];
+
+                $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
+
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-turnaround-wrapper'), true);
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-fidelity-wrapper'), true);
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-languages-wrapper'), true);
+            });
+
+            it('removes error state on preferances if selected', function() {
+                var requests = AjaxHelpers.requests(this);
+
+                // Provide values for preferances.
+                $courseVideoSettingsEl.find('#transcript-turnaround').val('test-value');
+                $courseVideoSettingsEl.find('#transcript-fidelity').val('test-value');
+                $courseVideoSettingsEl.find('#transcript-language-menu').val('test-value');
+
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-turnaround-wrapper'), false);
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-fidelity-wrapper'), false);
+                verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-languages-wrapper'), false);
             });
         });
     }
