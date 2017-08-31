@@ -946,7 +946,7 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grad
     ]):
         return None
 
-    if CourseMode.is_eligible_for_certificate(enrollment_mode):
+    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
         return CertData(
             CertificateStatuses.audit_passing,
             _('Your enrollment: Audit track'),
