@@ -8,6 +8,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 WAFFLE_NAMESPACE = u'certificates'
 
 # Switches
+AUTO_CERTIFICATE_GENERATION_ENABLED = u'auto_certificate_generation_enabled'
 SELF_PACED_ONLY = u'self_paced_only'
 INSTRUCTOR_PACED_ONLY = u'instructor_paced_only'
 

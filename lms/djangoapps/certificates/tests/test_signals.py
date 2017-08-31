@@ -15,6 +15,7 @@ from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,6 +31,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         super(SelfGeneratedCertsSignalTest, self).setUp()
         SelfPacedConfiguration(enabled=True).save()
         self.course = CourseFactory.create(self_paced=True)
+        CourseOverview.load_from_module_store(self.course.id)
         # Enable the feature
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
@@ -60,6 +62,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     def setUp(self):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
         self.course = CourseFactory.create(self_paced=True)
+        CourseOverview.load_from_module_store(self.course.id)
         self.user = UserFactory.create()
         CourseEnrollmentFactory(
             user=self.user,
@@ -68,6 +71,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
             mode="verified",
         )
         self.ip_course = CourseFactory.create(self_paced=False)
+        CourseOverview.load_from_module_store(self.ip_course.id)
         CourseEnrollmentFactory(
             user=self.user,
             course_id=self.ip_course.id,
@@ -135,6 +139,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             self_paced=True,
         )
+        CourseOverview.load_from_module_store(self.course.id)
         self.user = UserFactory.create()
         self.enrollment = CourseEnrollmentFactory(
             user=self.user,
@@ -143,6 +148,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             mode="verified",
         )
         self.ip_course = CourseFactory.create(self_paced=False)
+        CourseOverview.load_from_module_store(self.ip_course.id)
         self.ip_enrollment = CourseEnrollmentFactory(
             user=self.user,
             course_id=self.ip_course.id,
@@ -216,6 +222,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     def setUp(self):
         super(LearnerTrackChangeCertsTest, self).setUp()
         self.course_one = CourseFactory.create(self_paced=True)
+        CourseOverview.load_from_module_store(self.course_one.id)
         self.user_one = UserFactory.create()
         self.enrollment_one = CourseEnrollmentFactory(
             user=self.user_one,
@@ -225,6 +232,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
         )
         self.user_two = UserFactory.create()
         self.course_two = CourseFactory.create(self_paced=False)
+        CourseOverview.load_from_module_store(self.course_two.id)
         self.enrollment_two = CourseEnrollmentFactory(
             user=self.user_two,
             course_id=self.course_two.id,
