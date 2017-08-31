@@ -11,119 +11,119 @@ define(
                 verifyPreferanceErrorState,
                 transcriptPreferencesUrl = '/transcript_preferences/course-v1:edX+DemoX+Demo_Course',
                 activeTranscriptPreferences = {
-                    'provider': 'Cielo24',
-                    'cielo24_fidelity': 'PROFESSIONAL',
-                    'cielo24_turnaround': 'PRIORITY',
-                    'three_play_turnaround': '',
-                    'preferred_languages': [
+                    provider: 'Cielo24',
+                    cielo24_fidelity: 'PROFESSIONAL',
+                    cielo24_turnaround: 'PRIORITY',
+                    three_play_turnaround: '',
+                    preferred_languages: [
                         'ru',
                         'fr',
                         'pt',
                         'nl'
                     ],
-                    'modified': '2017-08-27T12:28:17.421260Z'
+                    modified: '2017-08-27T12:28:17.421260Z'
                 },
                 transcriptionPlans = {
                     '3PlayMedia': {
-                        'languages': {
-                            'fr': 'French',
-                            'en': 'English',
-                            'ms': 'Malay',
-                            'tr': 'Turkish',
-                            'de': 'German',
-                            'it': 'Italian',
-                            'da': 'Danish',
-                            'ar': 'Arabic',
-                            'uk': 'Ukrainian',
-                            'bg': 'Bulgarian',
-                            'cs': 'Czech',
-                            'fi': 'Finnish',
-                            'hu': 'Hungarian',
-                            'ja': 'Japanese',
-                            'he': 'Hebrew',
-                            'ru': 'Russian',
-                            'ro': 'Romanian',
-                            'nl': 'Dutch',
-                            'pt': 'Portuguese',
-                            'no': 'Norwegian',
+                        languages: {
+                            fr: 'French',
+                            en: 'English',
+                            ms: 'Malay',
+                            tr: 'Turkish',
+                            de: 'German',
+                            it: 'Italian',
+                            da: 'Danish',
+                            ar: 'Arabic',
+                            uk: 'Ukrainian',
+                            bg: 'Bulgarian',
+                            cs: 'Czech',
+                            fi: 'Finnish',
+                            hu: 'Hungarian',
+                            ja: 'Japanese',
+                            he: 'Hebrew',
+                            ru: 'Russian',
+                            ro: 'Romanian',
+                            nl: 'Dutch',
+                            pt: 'Portuguese',
+                            no: 'Norwegian',
                             'zh-hans': 'Chinese (Simplified)',
-                            'sr': 'Serbian',
-                            'ko': 'Korean',
-                            'sv': 'Swedish',
-                            'id': 'Indonesian',
-                            'sk': 'Slovak',
-                            'tl': 'Tagalog',
-                            'th': 'Thai',
-                            'vi': 'Vietnamese',
+                            sr: 'Serbian',
+                            ko: 'Korean',
+                            sv: 'Swedish',
+                            id: 'Indonesian',
+                            sk: 'Slovak',
+                            tl: 'Tagalog',
+                            th: 'Thai',
+                            vi: 'Vietnamese',
                             'es-419': 'Spanish (Latin America)',
                             'zh-cmn-Hant': 'Chinese (Traditional)',
-                            'pl': 'Polish'
+                            pl: 'Polish'
                         },
-                        'turnaround': {
-                            'default': '4-Day/Default',
-                            'same_day_service': 'Same Day',
-                            'rush_service': '24-hour/Rush',
-                            'extended_service': '10-Day/Extended',
-                            'expedited_service': '2-Day/Expedited'
+                        turnaround: {
+                            default: '4-Day/Default',
+                            same_day_service: 'Same Day',
+                            rush_service: '24-hour/Rush',
+                            extended_service: '10-Day/Extended',
+                            expedited_service: '2-Day/Expedited'
                         },
-                        'display_name': '3PlayMedia'
+                        display_name: '3PlayMedia'
                     },
-                    'Cielo24': {
-                        'turnaround': {
-                            'PRIORITY': 'Priority, 24h',
-                            'STANDARD': 'Standard, 48h'
+                    Cielo24: {
+                        turnaround: {
+                            PRIORITY: 'Priority, 24h',
+                            STANDARD: 'Standard, 48h'
                         },
-                        'fidelity': {
-                        'PROFESSIONAL': {
-                            'languages': {
-                                'ru': 'Russian',
-                                'fr': 'French',
-                                'en': 'English',
-                                'nl': 'Dutch',
-                                'pt': 'Portuguese',
-                                'zh-yue': 'Chinese - Cantonese (Traditional)',
-                                'zh-tw': 'Chinese - Mandarin (Traditional)',
-                                'de': 'German',
-                                'ko': 'Korean',
-                                'zh-cmn': 'Chinese - Mandarin (Simplified)',
-                                'it': 'Italian',
-                                'tr': 'Turkish',
-                                'ar': 'Arabic',
-                                'hi': 'Hindi',
-                                'ja': 'Japanese',
-                                'es': 'Spanish',
-                                'he': 'Hebrew'
+                        fidelity: {
+                            PROFESSIONAL: {
+                                languages: {
+                                    ru: 'Russian',
+                                    fr: 'French',
+                                    en: 'English',
+                                    nl: 'Dutch',
+                                    pt: 'Portuguese',
+                                    'zh-yue': 'Chinese - Cantonese (Traditional)',
+                                    'zh-tw': 'Chinese - Mandarin (Traditional)',
+                                    de: 'German',
+                                    ko: 'Korean',
+                                    'zh-cmn': 'Chinese - Mandarin (Simplified)',
+                                    it: 'Italian',
+                                    tr: 'Turkish',
+                                    ar: 'Arabic',
+                                    hi: 'Hindi',
+                                    ja: 'Japanese',
+                                    es: 'Spanish',
+                                    he: 'Hebrew'
+                                },
+                                display_name: 'Professional, 99% Accuracy'
                             },
-                            'display_name': 'Professional, 99% Accuracy'
-                        },
-                        'PREMIUM': {
-                            'languages': {
-                                'en': 'English'
+                            PREMIUM: {
+                                languages: {
+                                    en: 'English'
+                                },
+                                display_name: 'Premium, 95% Accuracy'
                             },
-                            'display_name': 'Premium, 95% Accuracy'
-                        },
-                        'MECHANICAL': {
-                            'languages': {
-                                'fr': 'French',
-                                'en': 'English',
-                                'nl': 'Dutch',
-                                'de': 'German',
-                                'it': 'Italian',
-                                'es': 'Spanish'
-                            },
-                            'display_name': 'Mechanical, 75% Accuracy'
+                            MECHANICAL: {
+                                languages: {
+                                    fr: 'French',
+                                    en: 'English',
+                                    nl: 'Dutch',
+                                    de: 'German',
+                                    it: 'Italian',
+                                    es: 'Spanish'
+                                },
+                                display_name: 'Mechanical, 75% Accuracy'
                             }
                         },
-                        'display_name': 'Cielo24'
+                        display_name: 'Cielo24'
                     }
                 };
 
-            renderCourseVideoSettingsView = function(activeTranscriptPreferences, transcriptionPlans) {
-                courseVideoSettingsView  = new CourseVideoSettingsView({
-                    activeTranscriptPreferences: activeTranscriptPreferences || null,
+            renderCourseVideoSettingsView = function(activeTranscriptPreferencesData, transcriptionPlansData) {
+                courseVideoSettingsView = new CourseVideoSettingsView({
+                    activeTranscriptPreferences: activeTranscriptPreferencesData || null,
                     videoTranscriptSettings: {
                         transcript_preferences_handler_url: transcriptPreferencesUrl,
-                        transcription_plans: transcriptionPlans || null
+                        transcription_plans: transcriptionPlansData || null
                     }
                 });
                 $courseVideoSettingsEl = courseVideoSettingsView.render().$el;
@@ -137,7 +137,7 @@ define(
             };
 
             verifyPreferanceErrorState = function($preferanceContainerEl, hasError) {
-                var $errorIconHtml = hasError ? '<span class="icon fa fa-info-circle" aria-hidden="true"></span>': '',
+                var $errorIconHtml = hasError ? '<span class="icon fa fa-info-circle" aria-hidden="true"></span>' : '',
                     requiredText = hasError ? 'Required' : '';
                 expect($preferanceContainerEl.hasClass('error')).toEqual(hasError);
                 expect($preferanceContainerEl.find('.error-icon').html()).toEqual($errorIconHtml);
@@ -173,7 +173,7 @@ define(
                 expect($courseVideoSettingsEl.find('.course-video-settings-container')).not.toExist();
             });
 
-            it('does not close course video settings pane when clicked inside the course video settings pane', function() {
+            it('does not close course video settings pane when clicked inside course video settings pane', function() {
                 expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
                 $courseVideoSettingsEl.find('.transcript-provider-group').click();
                 expect($courseVideoSettingsEl.find('.course-video-settings-container')).toExist();
@@ -210,7 +210,9 @@ define(
                     activeTranscriptPreferences.cielo24_fidelity
                 );
                 expect(
-                    $courseVideoSettingsEl.find('.languages-menu-container .transcript-language-menu-container:not(:has(.transcript-language-menu))').length
+                    $courseVideoSettingsEl.find(
+                        '.transcript-language-menu-container:not(:has(.transcript-language-menu))'
+                    ).length
                 ).toEqual(activeTranscriptPreferences.preferred_languages.length);
 
                 // Now check values are assigned correctly.
@@ -234,7 +236,7 @@ define(
                         cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
-                        global: false,
+                        global: false
                     })
                 );
 
@@ -263,7 +265,7 @@ define(
                         cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
-                        global: false,
+                        global: false
                     })
                 );
 
@@ -279,8 +281,6 @@ define(
             });
 
             it('implies preferences are required if not selected when saving preferances', function() {
-                var requests = AjaxHelpers.requests(this);
-
                 // Reset so that no preferance is selected.
                 courseVideoSettingsView.selectedTurnaroundPlan = '';
                 courseVideoSettingsView.selectedFidelityPlan = '';
@@ -294,8 +294,6 @@ define(
             });
 
             it('removes error state on preferances if selected', function() {
-                var requests = AjaxHelpers.requests(this);
-
                 // Provide values for preferances.
                 $courseVideoSettingsEl.find('#transcript-turnaround').val('test-value');
                 $courseVideoSettingsEl.find('#transcript-fidelity').val('test-value');

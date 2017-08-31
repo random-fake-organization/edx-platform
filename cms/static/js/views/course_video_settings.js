@@ -26,8 +26,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         initialize: function(options) {
             var videoTranscriptSettings = options.videoTranscriptSettings;
             this.activeTranscriptionPlan = options.activeTranscriptPreferences;
-            this.availableTranscriptionPlans = videoTranscriptSettings['transcription_plans'];
-            this.transcriptHandlerUrl = videoTranscriptSettings['transcript_preferences_handler_url'];
+            this.availableTranscriptionPlans = videoTranscriptSettings.transcription_plans;
+            this.transcriptHandlerUrl = videoTranscriptSettings.transcript_preferences_handler_url;
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
             this.setActiveTranscriptPlanData();
             this.selectedLanguages = [];
@@ -39,12 +39,12 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Preventing any parent handlers from being notified of the event. This is to stop from firing the document
             // level click handler to execute on course video settings pane click.
-            self.$el.click(function(event){
+            self.$el.click(function(event) {
                 event.stopPropagation();
             });
 
             // Click anywhere outside the course video settings pane would close the pane.
-            $(document).click(function(event){
+            $(document).click(function(event) {
                 // if the target of the click isn't the container nor a descendant of the contain
                 if (!self.$el.is(event.target) && self.$el.has(event.target).length === 0) {
                     self.closeCourseVideoSettings();
@@ -61,12 +61,14 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.selectedLanguages = [];
         },
 
-        setActiveTranscriptPlanData: function(){
+        setActiveTranscriptPlanData: function() {
             if (this.activeTranscriptionPlan) {
-                this.selectedProvider = this.activeTranscriptionPlan['provider'];
-                this.selectedFidelityPlan = this.activeTranscriptionPlan['cielo24_fidelity'];
-                this.selectedTurnaroundPlan = this.selectedProvider === 'Cielo24' ? this.activeTranscriptionPlan['cielo24_turnaround']: this.activeTranscriptionPlan['three_play_turnaround'];
-                this.activeLanguages = this.activeTranscriptionPlan['preferred_languages'];
+                this.selectedProvider = this.activeTranscriptionPlan.provider;
+                this.selectedFidelityPlan = this.activeTranscriptionPlan.cielo24_fidelity;
+                this.selectedTurnaroundPlan = this.selectedProvider === 'Cielo24' ?
+                    this.activeTranscriptionPlan.cielo24_turnaround :
+                    this.activeTranscriptionPlan.three_play_turnaround;
+                this.activeLanguages = this.activeTranscriptionPlan.preferred_languages;
             } else {
                 this.resetPlanData();
             }
@@ -77,25 +79,27 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         getTurnaroundPlan: function() {
-            if (this.selectedProvider){
-                return this.availableTranscriptionPlans[this.selectedProvider].turnaround;
+            var turnaroundPlan = null;
+            if (this.selectedProvider) {
+                turnaroundPlan = this.availableTranscriptionPlans[this.selectedProvider].turnaround;
             }
+            return turnaroundPlan;
         },
 
         getFidelityPlan: function() {
-            if (this.selectedProvider == 'Cielo24') {
-                return this.availableTranscriptionPlans[this.selectedProvider].fidelity;
+            var fidelityPlan = null;
+            if (this.selectedProvider === 'Cielo24') {
+                fidelityPlan = this.availableTranscriptionPlans[this.selectedProvider].fidelity;
             }
+            return fidelityPlan;
         },
 
         getPlanLanguages: function() {
-            if (this.selectedProvider){
-                var selectedPlan = this.availableTranscriptionPlans[this.selectedProvider];
-                if (this.selectedProvider == 'Cielo24') {
-                    return selectedPlan.fidelity[this.selectedFidelityPlan].languages;
-                }
-                return selectedPlan.languages;
+            var selectedPlan = this.availableTranscriptionPlans[this.selectedProvider];
+            if (this.selectedProvider === 'Cielo24') {
+                return selectedPlan.fidelity[this.selectedFidelityPlan].languages;
             }
+            return selectedPlan.languages;
         },
 
         fidelitySelected: function(event) {
@@ -142,7 +146,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                             }
                         ),
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
+                            HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'), // eslint-disable-line max-len
                             {
                                 languageCode: selectedLanguage,
                                 text: gettext('Remove'),
@@ -171,11 +175,10 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 $providerEl = self.$el.find('.transcript-provider-group');
 
             if (providerPlan) {
-                $providerEl.empty();
                 HtmlUtils.setHtml(
                     $providerEl,
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),
+                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),    // eslint-disable-line max-len
                         {
                             text: gettext('N/A'),
                             checked: self.selectedProvider === '' ? 'checked' : ''
@@ -183,19 +186,19 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     )
                 );
 
-                _.each(providerPlan, function (providerObject, key) {
+                _.each(providerPlan, function(providerObject, key) {
                     var checked = self.selectedProvider === key ? 'checked' : '';
                     HtmlUtils.append(
                         $providerEl,
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),
+                            HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),   // eslint-disable-line max-len
                             {
                                 text: providerObject.display_name,
                                 value: key,
                                 checked: checked
                             }
                         )
-                    )
+                    );
                 });
             }
         },
@@ -209,14 +212,17 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             // Clear error state if present any.
             this.clearPreferanceErrorState($turnaroundContainer);
 
-            if(self.selectedProvider && turnaroundPlan) {
-                $turnaround.empty().append(new Option(gettext('Select turnaround'), ''));
-                _.each(turnaroundPlan, function (value, key) {
+            if (self.selectedProvider && turnaroundPlan) {
+                HtmlUtils.setHtml(
+                    $turnaround,
+                    HtmlUtils.HTML(new Option(gettext('Select turnaround'), ''))
+                 );
+                _.each(turnaroundPlan, function(value, key) {
                     var option = new Option(value, key);
                     if (self.selectedTurnaroundPlan === key) {
                         option.selected = true;
                     }
-                    $turnaround.append(option);
+                    HtmlUtils.append($turnaround, HtmlUtils.HTML(option));
                 });
                 $turnaroundContainer.show();
             } else {
@@ -234,14 +240,17 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.clearPreferanceErrorState($fidelityContainer);
 
             // Fidelity dropdown
-            if (self.selectedProvider &&fidelityPlan) {
-                $fidelity.empty().append(new Option(gettext('Select fidelity'), ''));
-                _.each(fidelityPlan, function(fidelityObject, key){
+            if (self.selectedProvider && fidelityPlan) {
+                HtmlUtils.setHtml(
+                    $fidelity,
+                    HtmlUtils.HTML(new Option(gettext('Select fidelity'), ''))
+                );
+                _.each(fidelityPlan, function(fidelityObject, key) {
                     var option = new Option(fidelityObject.display_name, key);
                     if (self.selectedFidelityPlan === key) {
                         option.selected = true;
                     }
-                    $fidelity.append(option);
+                    HtmlUtils.append($fidelity, HtmlUtils.HTML(option));
                 });
                 self.$el.find('.transcript-fidelity-wrapper').show();
             } else {
@@ -263,9 +272,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             if (self.selectedProvider &&
                     ((isTurnaroundSelected > 0 && self.selectedProvider === '3PlayMedia') ||
-                    (isTurnaroundSelected  > 0 && isFidelitySelected > 0))) {
+                    (isTurnaroundSelected > 0 && isFidelitySelected > 0))) {
                 self.availableLanguages = self.getPlanLanguages();
-                _.each(self.activeLanguages, function(activeLanguage){
+                _.each(self.activeLanguages, function(activeLanguage) {
                     // Only add if not in the list already.
                     if (_.indexOf(self.selectedLanguages, activeLanguage) === -1) {
                         self.selectedLanguages.push(activeLanguage);
@@ -280,7 +289,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                                     }
                                 ),
                                 HtmlUtils.interpolateHtml(
-                                    HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'),
+                                    HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'), // eslint-disable-line max-len
                                     {
                                         languageCode: activeLanguage,
                                         text: gettext('Remove'),
@@ -316,21 +325,21 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 totalCurrentLanguageMenus = $languagesContainer.find('.transcript-language-menu').length;
 
             // Omit out selected languages from selecting again.
-             availableLanguages = _.omit(this.availableLanguages, this.selectedLanguages);
+            availableLanguages = _.omit(this.availableLanguages, this.selectedLanguages);
 
             HtmlUtils.append(
                 $languagesContainer,
                 HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<div class="transcript-language-menu-container">'),
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<select class="transcript-language-menu" id="transcript-language-menu-{languageMenuId}"></select>'),
+                        HtmlUtils.HTML('<select class="transcript-language-menu" id="transcript-language-menu-{languageMenuId}"></select>'),    // eslint-disable-line max-len
                         {
                             languageMenuId: totalCurrentLanguageMenus
                         }
                     ),
                     HtmlUtils.HTML('<div class="add-language-action">'),
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<button class="button-link action-add-language">{text}<span class="sr">{srText}</span></button>'),
+                        HtmlUtils.HTML('<button class="button-link action-add-language">{text}<span class="sr">{srText}</span></button>'),  // eslint-disable-line max-len
                         {
                             text: gettext('Add'),
                             srText: gettext('Press Add to language')
@@ -342,9 +351,15 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             );
             $transcriptLanguage = this.$el.find('#transcript-language-menu-' + totalCurrentLanguageMenus);
 
-            $transcriptLanguage.append(new Option(gettext('Select language'), ''));
-            _.each(availableLanguages, function(value, key){
-                $transcriptLanguage.append(new Option(value, key));
+            HtmlUtils.append(
+                $transcriptLanguage,
+                HtmlUtils.HTML(new Option(gettext('Select language'), ''))
+            );
+            _.each(availableLanguages, function(value, key) {
+                HtmlUtils.append(
+                    $transcriptLanguage,
+                    HtmlUtils.HTML(new Option(value, key))
+                );
             });
         },
 
@@ -386,17 +401,16 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
 
             // Explicit None selected case.
-            if(this.selectedProvider === '') {
+            if (this.selectedProvider === '') {
                 return true;
             }
 
-            if (!this.selectedTurnaroundPlan){
+            if (!this.selectedTurnaroundPlan) {
                 isValid = false;
                 this.addErrorState($turnaroundEl);
             } else {
                 this.clearPreferanceErrorState($turnaroundEl);
             }
-
 
             if (this.selectedProvider === 'Cielo24' && !this.selectedFidelityPlan) {
                 isValid = false;
@@ -436,27 +450,31 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     HtmlUtils.setHtml(
                         $successEl,
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="course-video-settings-success"><span class="icon fa fa-check-circle" aria-hidden="true"></span><span>{text}</span></div>'),
+                            HtmlUtils.HTML('<div class="course-video-settings-success"><span class="icon fa fa-check-circle" aria-hidden="true"></span><span>{text}</span></div>'), // eslint-disable-line max-len
                             {
                                 text: gettext('Settings updated')
                             }
                         )
                     );
                     self.activeTranscriptionPlan = data.transcript_preferences;
+
                     // Sync ActiveUploadListView with latest active plan.
-                    Backbone.trigger('coursevideosettings:syncActiveTranscriptPreferences', self.activeTranscriptionPlan);
+                    Backbone.trigger(
+                        'coursevideosettings:syncActiveTranscriptPreferences',
+                        self.activeTranscriptionPlan
+                    );
                 }
-            }).fail(function(jqXHR, textStatus, errorThrown) {
+            }).fail(function(jqXHR) {
                 var errorMessage;
                 if (jqXHR.responseText) {
                     // Enclose inside try-catch so that if we get erroneous data, we could still show some error to user
                     try {
                         errorMessage = $.parseJSON(jqXHR.responseText).error;
-                    } catch (e) {}
+                    } catch (e) {}  // eslint-disable-line no-empty
                     HtmlUtils.setHtml(
                         $errorEl,
                         HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="course-video-settings-error"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span>{text}</span></div>'),
+                            HtmlUtils.HTML('<div class="course-video-settings-error"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span>{text}</span></div>'),    // eslint-disable-line max-len
                             {
                                 text: errorMessage || gettext('Error saving data')
                             }
@@ -466,9 +484,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             });
         },
 
-        updateCourseVideoSettings: function(event) {
+        updateCourseVideoSettings: function() {
             var $successEl = this.$el.find('.course-video-settings-success-wrapper');
-            if(this.validateCourseVideoSettings()) {
+            if (this.validateCourseVideoSettings()) {
                 this.saveTranscriptPreferences();
             } else {
                 $successEl.empty();
@@ -476,7 +494,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         render: function() {
-            var dateModified = this.activeTranscriptionPlan ? moment.utc(this.activeTranscriptionPlan['modified']).format('ll') : '';
+            var dateModified = this.activeTranscriptionPlan ?
+                moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
             HtmlUtils.setHtml(
                 this.$el,
                 this.template({
@@ -492,14 +511,14 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         setFixedCourseVideoSettingsPane: function() {
-            var self = this,
-                windowWidth = $(window).width(),
+            var windowWidth = $(window).width(),
                 windowHeight = $(window).height(),
                 $courseVideoSettingsButton = $('.course-video-settings-button'),
                 $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
                 initialPositionTop = $courseVideoSettingsContainer.offset().top,
                 courseVideoSettingsButtonLeft = $courseVideoSettingsButton.offset().left,
-                fixedOffsetRight = windowWidth - courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 25;
+                fixedOffsetRight = windowWidth -
+                    courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 25;
 
             // set windows total height
             $courseVideoSettingsContainer.css('height', windowHeight);
@@ -507,8 +526,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
 
             // Make sticky when scroll reaches top.
-            $(window).scroll(function(){
-
+            $(window).scroll(function() {
                 // Remove transition when we start scrolling.
                 // Why we do this? The settings pane does some back and forth movement when it is switched between
                 // position:fixed and position:absolute, it's right and top position are then being changed wrt to their
@@ -525,7 +543,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             });
         },
 
-        closeCourseVideoSettings: function(event) {
+        closeCourseVideoSettings: function() {
             // Trigger destroy transcript event.
             Backbone.trigger('coursevideosettings:destroyCourseVideoSettingsView');
 

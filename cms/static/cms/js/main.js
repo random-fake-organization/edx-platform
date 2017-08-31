@@ -65,7 +65,7 @@
                     dataType: 'json',
                     data: JSON.stringify(data),
                     success: callback,
-                    global: data ? data.global: true    // Trigger global AJAX error handler or not
+                    global: data ? data.global : true    // Trigger global AJAX error handler or not
                 });
             };
             $.postJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign

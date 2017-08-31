@@ -62,8 +62,16 @@ define([
                         supportedVideoTypes: this.videoSupportedFileFormats.join(', ')
                     }
                 );
-                this.listenTo(Backbone, 'coursevideosettings:syncActiveTranscriptPreferences', this.syncActiveTranscriptPreferences);
-                this.listenTo(Backbone, 'coursevideosettings:destroyCourseVideoSettingsView', this.destroyCourseVideoSettingsView);
+                this.listenTo(
+                    Backbone,
+                    'coursevideosettings:syncActiveTranscriptPreferences',
+                    this.syncActiveTranscriptPreferences
+                );
+                this.listenTo(
+                    Backbone,
+                    'coursevideosettings:destroyCourseVideoSettingsView',
+                    this.destroyCourseVideoSettingsView
+                );
             },
 
             syncActiveTranscriptPreferences: function(activeTranscriptPreferences) {
@@ -71,7 +79,7 @@ define([
             },
 
             showCourseVideoSettingsView: function(event) {
-                this.courseVideoSettingsView  = new CourseVideoSettingsView({
+                this.courseVideoSettingsView = new CourseVideoSettingsView({
                     activeTranscriptPreferences: this.activeTranscriptPreferences,
                     videoTranscriptSettings: this.videoTranscriptSettings
                 });
