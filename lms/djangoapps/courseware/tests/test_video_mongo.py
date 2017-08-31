@@ -1076,8 +1076,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
 
-
-    #  reorded val encoding according to priority
     @ddt.data(
         (
             {
