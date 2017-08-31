@@ -299,7 +299,16 @@ def is_certificate_invalid(student, course_key):
 
 
 def cert_generation_enabled(course_key):
-    """Check whether the self-generated certificates feature is enabled.
+    """Check whether certificate generation is enabled for a course.
+
+    There are two "switches" that control whether self-generated certificates
+    are enabled for a course:
+
+    1) Whether the self-generated certificates feature is enabled.
+    2) Whether self-generated certificates have been enabled for this particular course.
+
+    Certificates are enabled for a course only when both switches
+    are set to True.
 
     Arguments:
         course_key (CourseKey): The course identifier.
@@ -309,7 +318,10 @@ def cert_generation_enabled(course_key):
             for the course.
 
     """
-    return CertificateGenerationConfiguration.current().enabled
+    return (
+        CertificateGenerationConfiguration.current().enabled and
+        CertificateGenerationCourseSetting.is_enabled_for_course(course_key)
+    )
 
 
 def generate_example_certificates(course_key):
