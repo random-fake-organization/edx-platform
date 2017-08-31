@@ -100,13 +100,13 @@
         font-size: 0.75em;
       }
 
-      label {
+      .transcript-preferance-label {
         color: #333333;
         font-size: 15px;
         font-weight: font-weight(semi-bold);
       }
 
-      .transcript-provider-group, .transcript-languages-container, .transcript-turnaround, .transcript-fidelity  {
+      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity  {
         margin-top: 16px;
       }
 
@@ -117,6 +117,8 @@
         }
         label {
           font-weight: normal;
+          color: #333333;
+          font-size: 15px;
         }
       }
 

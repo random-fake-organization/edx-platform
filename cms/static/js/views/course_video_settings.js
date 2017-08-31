@@ -322,6 +322,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             var availableLanguages,
                 $transcriptLanguage,
                 $languagesContainer = this.$el.find('.languages-menu-container'),
+                selectOptionEl = new Option(gettext('Select language'), ''),
                 totalCurrentLanguageMenus = $languagesContainer.find('.transcript-language-menu').length;
 
             // Omit out selected languages from selecting again.
@@ -332,7 +333,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<div class="transcript-language-menu-container">'),
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<select class="transcript-language-menu" id="transcript-language-menu-{languageMenuId}"></select>'),    // eslint-disable-line max-len
+                        HtmlUtils.HTML('<select class="transcript-language-menu" id="transcript-language-menu-{languageMenuId}" aria-labelledby="first"></select>'),    // eslint-disable-line max-len
                         {
                             languageMenuId: totalCurrentLanguageMenus
                         }
@@ -351,9 +352,12 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             );
             $transcriptLanguage = this.$el.find('#transcript-language-menu-' + totalCurrentLanguageMenus);
 
+            // We need to set id due to a11y aria-labelledby
+            selectOptionEl.id = 'first';
+
             HtmlUtils.append(
                 $transcriptLanguage,
-                HtmlUtils.HTML(new Option(gettext('Select language'), ''))
+                HtmlUtils.HTML(selectOptionEl)
             );
             _.each(availableLanguages, function(value, key) {
                 HtmlUtils.append(
