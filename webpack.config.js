@@ -66,7 +66,7 @@ var wpconfig = {
             $: 'jquery',
             jQuery: 'jquery',
             'window.jQuery': 'jquery',
-            Popper: 'popper.js'
+            Popper: ['popper.js', 'default']
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
