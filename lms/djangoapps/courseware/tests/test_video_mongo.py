@@ -1076,31 +1076,33 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
 
+
+    #  reorded val encoding according to priority
     @ddt.data(
         (
             {
-                'desktop_webm': 'https://webm.com/dw.webm',
-                'hls': 'https://hls.com/hls.m3u8',
                 'youtube': 'v0TFmdO4ZP0',
-                'desktop_mp4': 'https://mp4.com/dm.mp4'
+                'hls': 'https://hls.com/hls.m3u8',
+                'desktop_mp4': 'https://mp4.com/dm.mp4',
+                'desktop_webm': 'https://webm.com/dw.webm',
             },
             ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
         ),
         (
             {
-                'desktop_webm': 'https://webm.com/dw.webm',
-                'hls': 'https://hls.com/hls.m3u8',
                 'youtube': None,
-                'desktop_mp4': 'https://mp4.com/dm.mp4'
+                'hls': 'https://hls.com/hls.m3u8',
+                'desktop_mp4': 'https://mp4.com/dm.mp4',
+                'desktop_webm': 'https://webm.com/dw.webm',
             },
             ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
         ),
         (
             {
-                'desktop_webm': None,
-                'hls': None,
                 'youtube': None,
-                'desktop_mp4': None
+                'hls': None,
+                'desktop_mp4': None,
+                'desktop_webm': None,
             },
             ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
         ),
@@ -1118,34 +1120,24 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
             )
             context = self.item_descriptor.get_context()
-            self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
+        self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
     @ddt.data(
         (
             {
-                'desktop_webm': 'https://webm.com/dw.webm',
-                'hls': 'https://hls.com/hls.m3u8',
-                'youtube': 'v0TFmdO4ZP0',
-                'desktop_mp4': 'https://mp4.com/dm.mp4'
-            },
-            ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
-
-        ),
-        (
-            {
-                'desktop_webm': 'https://webm.com/dw.webm',
-                'hls': None,
                 'youtube': None,
-                'desktop_mp4': 'https://mp4.com/dm.mp4'
+                'hls': None,
+                'desktop_mp4': 'https://mp4.com/dm.mp4',
+                'desktop_webm': 'https://webm.com/dw.webm',
             },
             ['https://mp4.com/dm.mp4']
         ),
         (
             {
-                'desktop_webm': 'https://webm.com/dw.webm',
-                'hls': None,
                 'youtube': None,
-                'desktop_mp4': None
+                'hls': None,
+                'desktop_mp4': None,
+                'desktop_webm': 'https://webm.com/dw.webm',
             },
             ['https://webm.com/dw.webm']
         ),
@@ -1163,7 +1155,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
             )
             context = self.item_descriptor.get_context()
-            self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
+        self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
 @attr(shard=1)
