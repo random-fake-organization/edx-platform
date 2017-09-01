@@ -81,7 +81,7 @@ from pipeline_mako import render_require_js_path_overrides
 
   % if uses_bootstrap:
     <%static:webpack entry="Popper"/>
-    <%static:webpack entry="Bootstrap"/>
+    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
   % endif
 
   <script>

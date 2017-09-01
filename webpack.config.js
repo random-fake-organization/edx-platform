@@ -19,7 +19,6 @@ var wpconfig = {
 
     entry: {
         // Common libraries
-        Bootstrap: './node_modules/bootstrap/dist/js/bootstrap.js',
         Popper: './node_modules/popper.js/dist/popper.js',
 
         // Studio
@@ -108,7 +107,6 @@ var wpconfig = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: [
-                    /node_modules/,
                     namespacedRequireFiles
                 ],
                 use: 'babel-loader'
