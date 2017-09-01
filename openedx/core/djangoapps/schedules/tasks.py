@@ -80,7 +80,7 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
         course = enrollment.course
 
         course_root = reverse('course_root', args=[course_id_str])
-        sign_in_url = reverse('login')
+        dashboard_url = reverse('dashboard')
 
         def absolute_url(relative_path):
             return u'{}{}'.format(settings.LMS_ROOT_URL, urlquote(relative_path))
@@ -98,7 +98,7 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
             'course_url': absolute_url(course_root),
 
             # Platform information
-            'login_url': absolute_url(sign_in_url),
+            'dashboard_url': absolute_url(dashboard_url),
             'template_revision': template_revision,
             'template_tag': template_tag,
             'platform_name': settings.PLATFORM_NAME,
