@@ -378,7 +378,7 @@
 
                         &:not(:last-child) {
                             padding-bottom: $baseline/4;
-                            border-bottom: 1px solid $gray-lighter;
+                            border-bottom: 1px solid $border-color;
 
                             &:hover.mode-placeholder {
                                 padding-bottom: $baseline/5;
