@@ -19,7 +19,7 @@ var wpconfig = {
 
     entry: {
         // Common libraries
-        Popper: './node_modules/popper.js/dist/popper.js',
+        Popper: './common/static/common/js/vendor/popper.js',
 
         // Studio
         Import: './cms/static/js/features/import/factories/import.js',
@@ -107,6 +107,7 @@ var wpconfig = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: [
+                    /node_modules/,
                     namespacedRequireFiles
                 ],
                 use: 'babel-loader'
