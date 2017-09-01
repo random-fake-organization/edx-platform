@@ -4,4 +4,4 @@
     participating in the discussion forums. What do you want to do to keep learning?
 {% endblocktrans %}
 
-{% blocktrans %}Keep learning{% endblocktrans %} <{{course_url}}>
+{% trans "Keep learning" %} <{{course_url}}>

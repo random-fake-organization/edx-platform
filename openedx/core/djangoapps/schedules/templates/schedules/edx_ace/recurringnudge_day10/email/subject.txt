@@ -1,2 +1,2 @@
 {% load i18n %}
-{% blocktrans %}Keep up the momentum!{% endblocktrans %}
+{% trans "Keep up the momentum!" %}
