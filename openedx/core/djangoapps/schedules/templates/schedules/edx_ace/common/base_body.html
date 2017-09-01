@@ -14,8 +14,8 @@ email itself. -->
 ">
     {% block preview_text %}{% endblock %}
 </div>
-<img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
 <a href="{view_url}">{% blocktrans %}View on Web{% endblocktrans %}</a>
+<img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
 
 {% get_current_language as LANGUAGE_CODE %}
 <div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" style="
