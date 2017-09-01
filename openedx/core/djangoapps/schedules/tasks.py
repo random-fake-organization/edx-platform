@@ -80,6 +80,7 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
         course = enrollment.course
 
         course_root = reverse('course_root', args=[course_id_str])
+        sign_in_url = reverse('login')
 
         def absolute_url(relative_path):
             return u'{}{}'.format(settings.LMS_ROOT_URL, urlquote(relative_path))
@@ -95,8 +96,15 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
             'student_name': user.profile.name,
             'course_name': course.display_name,
             'course_url': absolute_url(course_root),
+
+            # Platform information
+            'login_url': absolute_url(sign_in_url),
             'template_revision': template_revision,
             'template_tag': template_tag,
+            'platform_name': settings.PLATFORM_NAME,
+            'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
+            'social_media_urls': getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {}),
+            'mobile_store_urls': getattr(settings, 'MOBILE_STORE_URLS', {}),
 
             # This is used by the bulk email optout policy
             'course_id': course_id_str,
