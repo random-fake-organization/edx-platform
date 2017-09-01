@@ -810,7 +810,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
         if is_self_paced:
-            expected_date = datetime.datetime.today()
+            expected_date = datetime.datetime.utcnow().date()
         else:
             expected_date = self.course.certificate_available_date
 
