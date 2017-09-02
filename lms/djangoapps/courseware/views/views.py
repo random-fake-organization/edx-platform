@@ -77,7 +77,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.certificates.config import waffle as certificates_waffle
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -905,7 +905,7 @@ def _progress(request, course_key, student_id):
     return response
 
 
-def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary):
+def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary=None):
     """Returns students course certificate related data.
 
     Arguments:
@@ -921,6 +921,15 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grad
     """
     from lms.djangoapps.courseware.courses import get_course_by_id
 
+    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
+        return CertData(
+            CertificateStatuses.audit_passing,
+            _('Your enrollment: Audit track'),
+            _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
+            download_url=None,
+            cert_web_view_url=None
+        )
+
     may_view_certificate = False
     # https://openedx.atlassian.net/browse/EDUCATOR-1204: historically,
     # certificates for self-paced courses are displayed no matter the
@@ -929,8 +938,9 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grad
         course = get_course_by_id(course_key)
         may_view_certificate = course.self_paced or course.may_certify()
 
-    switches = waffle.waffle()
-    switches_enabled = switches.is_enabled(waffle.SELF_PACED_ONLY) and switches.is_enabled(waffle.INSTRUCTOR_PACED_ONLY)
+    switches = certificates_waffle.waffle()
+    switches_enabled = (switches.is_enabled(certificates_waffle.SELF_PACED_ONLY) and
+                        switches.is_enabled(certificates_waffle.INSTRUCTOR_PACED_ONLY))
     student_cert_generation_enabled = certs_api.cert_generation_enabled(course_key) if not switches_enabled else True
 
     # Don't show certificate information if:
@@ -945,15 +955,6 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grad
         may_view_certificate
     ]):
         return None
-
-    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
-        return CertData(
-            CertificateStatuses.audit_passing,
-            _('Your enrollment: Audit track'),
-            _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
-            download_url=None,
-            cert_web_view_url=None
-        )
 
     if certs_api.is_certificate_invalid(student, course_key):
         return CertData(

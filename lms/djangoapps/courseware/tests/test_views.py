@@ -38,6 +38,7 @@ from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
 from nose.plugins.attrib import attr
@@ -1565,6 +1566,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
         PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
          in audit mode.
@@ -1579,6 +1581,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
         )
 
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_invalidated_cert_data(self):
         """
         Verify that invalidated cert data is returned if cert is invalidated.
@@ -1597,6 +1600,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_downloadable_get_cert_data(self):
         """
         Verify that downloadable cert data is returned if cert is downloadable.
@@ -1611,6 +1615,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'downloadable')
         self.assertEqual(response.title, 'Your certificate is available')
 
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_generating_get_cert_data(self):
         """
         Verify that generating cert data is returned if cert is generating.
@@ -1625,6 +1630,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'generating')
         self.assertEqual(response.title, "We're working on it...")
 
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_unverified_get_cert_data(self):
         """
         Verify that unverified cert data is returned if cert is unverified.
@@ -1639,6 +1645,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'unverified')
         self.assertEqual(response.title, "Certificate unavailable")
 
+    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_request_get_cert_data(self):
         """
         Verify that requested cert data is returned if cert is to be requested.
