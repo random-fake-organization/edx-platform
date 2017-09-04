@@ -3,6 +3,9 @@
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
 
+fake_change:
+        echo "Hello there"
+
 clean:
 	# Remove all the git-ignored stuff, but save and restore things marked
 	# by start-noclean/end-noclean. Include Makefile in the tarball so that
